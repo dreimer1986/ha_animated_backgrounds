@@ -1,0 +1,6 @@
+{
+  "videoFiles": {
+    "sunny": ["lokales_sonnenvideo.mp4"],
+    "page-event": ["wallbox_neu_1.webm", "wallbox_neu_2.webm"]
+  }
+}
