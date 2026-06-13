@@ -1,6 +1,11 @@
 {
   "videoFiles": {
-    "sunny": ["lokales_sonnenvideo.mp4"],
-    "page-event": ["wallbox_neu_1.webm", "wallbox_neu_2.webm"]
+    "sunny": ["lokales_video_sonne.mp4"],
+    "cloudy": ["lokales_video_wolken.webm"],
+    "clear-night": ["lokales_video_sterne.mp4"],
+    "page-wallbox": ["wallbox_neu_1.webm", "wallbox_neu_2.webm"]
+    "page-settings": ["gears_1.webm", "gears_2.webm"]
+    "page-cam": ["kamera_1.webm", "kamera_2.webm"]
+    "page-developer-tools": ["dev_1.webm", "dev_2.webm"]
   }
 }
