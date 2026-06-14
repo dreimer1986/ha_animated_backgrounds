@@ -32,17 +32,23 @@ Now I thought I should extend the script a bit. Like, make it more user friendly
 And here we are now... A perfectly fine working alternative with not all, but most features the addin had, too. What started as a quick theme hack has now evolved into a highly optimized, fully-fledged background engine. You no longer have to maintain different script variations or touch a single line of JavaScript code just because you added a new dashboard tab. This one handles everything dynamically.
 
 ## <a name="features"></a>🚀 Features
-**Zero Code Modification:** Install it once, control everything else through a separate JSON configuration file.
+**Zero Code Modification:**<br/>
+Install it once, control everything else through a separate JSON configuration file.
 
-**Dynamic Page Routing:** Simply add a list with the prefix page-your-tab in your JSON, and the script automatically switches to those videos whenever the URL path contains /your-tab.
+**Dynamic Page Routing:**<br/>
+Simply add a list with the prefix page-your-tab in your JSON, and the script automatically switches to those videos whenever the URL path contains /your-tab.
 
-**Codec-Mix (MP4 & WebM):** The script dynamically detects the MIME-type on every single video change. You can freely mix .mp4 and .webm files inside the very same list.
+**Codec-Mix (MP4 & WebM):**<br/>
+The script dynamically detects the MIME-type on every single video change. You can freely mix .mp4 and .webm files inside the very same list.
 
-**Instant Cache-Busting:** The configuration file is fetched with a cache-busting timestamp. Any updates to your video lists are active immediately after a page refresh—no more manual browser cache purging!
+**Instant Cache-Busting:**<br/>
+The configuration file is fetched with a cache-busting timestamp. Any updates to your video lists are active immediately after a page refresh—no more manual browser cache purging!
 
-**No Long-Term Tokens Needed:** The script safely communicates directly with the native Home Assistant frontend DOM object to fetch states, removing the old requirement for manual long-term access tokens.
+**No Long-Term Tokens Needed:**<br/>
+The script safely communicates directly with the native Home Assistant frontend DOM object to fetch states, removing the old requirement for manual long-term access tokens.
 
-**Home Assistant Helper Support:** Toggle weather control, switch between local/CDN paths, or adjust the video rotation interval in real-time using native input_boolean or input_number entities directly from your UI.
+**Home Assistant Helper Support:**<br/>
+Toggle weather control, switch between local/CDN paths, or adjust the video rotation interval in real-time using native input_boolean or input_number entities directly from your UI.
 
 ## <a name="install"></a>📦 Installation
 
@@ -53,12 +59,12 @@ And here we are now... A perfectly fine working alternative with not all, but mo
    Resource type: JavaScript-Modul
 4. Open your configuration.yaml and append the script to your frontend section:
 5. Add /local/styles.js?v=1 to the frontend section:
-   <pre>
-   YAML
+```yaml
    frontend:
      extra_module_url:
        - /local/styles.js?v=1.5
-   </pre>
+```
+
 6. **Optional:** Create a folder named config/www/animated_backgrounds/ to store your local video files.
 7. Restart Home Assistant or reload the core configuration.
 
@@ -67,7 +73,7 @@ And here we are now... A perfectly fine working alternative with not all, but mo
 To supply your own videos or set up specific pages, create a file named config.json and place it right inside your video directory (www/animated_backgrounds/config.json).
 
 Example: A fully customized config.json
-JSON
+```json
 {
   "videoFiles": {
     "sunny": [
@@ -86,8 +92,9 @@ JSON
     ]
   }
 }
+```
 
-**How does Dynamic Page Routing work?**
+**How does Dynamic Page Routing work?**<br/>
 If a user opens a dashboard tab with the URL /dashboard-main/wallbox, the script scans the JSON keys starting with page-. It detects page-wallbox, matches the keyword wallbox against the current URL, and immediately switches the background to your specified wallbox loops. The moment you navigate away to a standard page, it instantly reverts back to the default weather or random rotation!
 
 **Optional Home Assistant Helpers**
@@ -100,7 +107,7 @@ The script automatically checks for predefined helpers in Home Assistant. If the
 | **Use Local Files** | `input_boolean` | `input_boolean.animated_backgrounds_use_local` | **On:** Uses local files under `/local/animated_backgrounds/` for weather states as well.<br>**Off:** Loads weather videos efficiently from the Flixel CDN. |
 | **Switch Interval** | `input_number` | `input_number.animated_backgrounds_video_switch_period` | Defines the interval in seconds after which a new random video is selected from the active list (e.g., `180` for 3 minutes). |
 
-**The manual way**
+**The manual way**<br/>
 If you look at the script with a fitting editor you can see the starting section has a few settings you can tinker with and by doing so, change the default settings without the need to a config.
 All of them are being explained now:
 
@@ -176,29 +183,33 @@ Because the video element is injected at the very bottom layer of the webpage, y
 
 The background image of the theme it is. Of course this is in the way if you wanna play a video there. So you set it to "transparent". 
 
-YAML
+```yaml
 lovelace-background: "transparent"
+```
 
 ### app-header-background-color:
 
 The top navigation header bar looks best with a semi-transparent styling. Convert your theme's HEX color to RGB (https://www.rapidtables.com/convert/color/hex-to-rgb.html) and add an alpha value using rgba(..., 0.5) for a sleek 50% look-through effect:
 
-YAML
+```yaml
 app-header-background-color: "rgba(20, 26, 50, 0.5)"
+```
 
 ### sidebar-background-color:
 
 To make the left sidebar transparent and let the background video span perfectly across the entire screen, link its background to the header color:
 
-YAML
+```yaml
 sidebar-background-color: "var(--app-header-background-color)"
+```
 
 ### app-header-edit-background-color:
 
 Ensures that the header area keeps its clean transparency look even while you are actively editing your Lovelace dashboards:
 
-YAML
+```yaml
 app-header-edit-background-color: "var(--app-header-background-color)"
+```
 
 **The UIX - UI eXtension fun**
 If you use UIX (https://uix-guides.lf.technology/) you can make other crazy things, too. Just check my theme you find here: https://github.com/dreimer1986/yourname_uix
