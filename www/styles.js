@@ -1,5 +1,5 @@
 console.info(
-    '%c  ANIMATED-BACKGROUNDS  %c  version 1.5 (Universal)  %c  by dreimer1986 ',
+    '%c  ANIMATED-BACKGROUNDS  %c  version 1.5.1 (Universal)  %c  by dreimer1986 ',
              'color: orange; font-weight: bold; background: black',
              'color: white; font-weight: bold; background: dimgray',
              'color: white; font-weight: bold; background: rgb(71, 170, 238)',
@@ -18,9 +18,8 @@ let weatherUseLocal_ = false;
 let videoSwitchPeriod_ = 180;
 
 // ==========================================
-// HOME ASSISTANT HELPERS (Standard-Definitionen)
+// HOME ASSISTANT HELPERS
 // ==========================================
-// If these Entities are not existing in Home Assistant the script will fallback to the defaults above.
 const weatherControlHelper_ = "input_boolean.animated_backgrounds_weather_control";
 const weatherUseLocalHelper_ = "input_boolean.animated_backgrounds_use_local";
 const videoSwitchPeriodHelper_ = "input_number.animated_backgrounds_video_switch_period";
@@ -94,7 +93,6 @@ async function loadExternalConfig() {
                 console.info('ANIMATED-BACKGROUNDS: External config.json loaded successfully.');
             }
         } else {
-            // Fängt den 404-Pfad logisch ab, falls die Datei optional nicht existiert
             console.info('ANIMATED-BACKGROUNDS: No optional config.json found. Using built-in defaults.');
         }
     } catch (e) {
@@ -138,19 +136,21 @@ function getVideoConfig(weatherState) {
         autoplay: true
     };
 
-    // 1. DYNAMIC PAGE DETECTION (Loops through all keys starting with 'page-')
-    for (const key in videoFiles) {
-        if (key.startsWith("page-")) {
-            const urlKeyword = key.substring(5); // Strips "page-"
-            if (window.location.pathname.includes(urlKeyword)) {
-                config.files = videoFiles[key];
+    // 1. DYNAMIC PAGE DETECTION (Sorted by key length)
+    // Prevents for example "config" matching "developer-tools".
+    const pageKeys = Object.keys(videoFiles)
+    .filter(key => key.startsWith("page-"))
+    .sort((a, b) => b.length - a.length);
 
-                // Keep special handling for camera views (e.g. disable autoplay)
-                if (urlKeyword === "cam") {
-                    config.autoplay = !lowPowerMode;
-                }
-                return config;
+    for (const key of pageKeys) {
+        const urlKeyword = key.substring(5); // Strips "page-"
+        if (window.location.pathname.includes(urlKeyword)) {
+            config.files = videoFiles[key];
+
+            if (urlKeyword === "cam") {
+                config.autoplay = !lowPowerMode;
             }
+            return config;
         }
     }
 
