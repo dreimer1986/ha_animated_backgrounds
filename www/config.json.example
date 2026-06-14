@@ -3,9 +3,8 @@
     "sunny": ["lokales_video_sonne.mp4"],
     "cloudy": ["lokales_video_wolken.webm"],
     "clear-night": ["lokales_video_sterne.mp4"],
-    "page-wallbox": ["wallbox_neu_1.webm", "wallbox_neu_2.webm"]
-    "page-settings": ["gears_1.webm", "gears_2.webm"]
-    "page-cam": ["kamera_1.webm", "kamera_2.webm"]
-    "page-developer-tools": ["dev_1.webm", "dev_2.webm"]
+    "page-wallbox": ['ch1.webm', 'ch2.webm'],
+    "page-settings": ['136511-764417302.webm', '9846-221477041.webm', '32742-393990266.webm', '55389-500762756.webm', '16189-269541588.webm'],
+    "page-developer-tools": ['16500-273202599.webm']
   }
 }
