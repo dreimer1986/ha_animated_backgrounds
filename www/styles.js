@@ -17,10 +17,13 @@ let weatherControl_ = true;
 let weatherUseLocal_ = false;
 let videoSwitchPeriod_ = 180;
 
-// OPTIONAL: Home Assistant Helpers
-const weatherControlHelper_ = "";
-const weatherUseLocalHelper_ = "";
-const videoSwitchPeriodHelper_ = "";
+// ==========================================
+// HOME ASSISTANT HELPERS (Standard-Definitionen)
+// ==========================================
+// If these Entities are not existing in Home Assistant the script will fallback to the defaults above.
+const weatherControlHelper_ = "input_boolean.animated_backgrounds_weather_control";
+const weatherUseLocalHelper_ = "input_boolean.animated_backgrounds_use_local";
+const videoSwitchPeriodHelper_ = "input_number.animated_backgrounds_video_switch_period";
 
 // Settings for forcing specific devices into single frame static image mode
 const slowDeviceUserAgent = "Kindle";
@@ -64,7 +67,7 @@ let currentSwitchPeriod = videoSwitchPeriod_;
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 const video = document.createElement('video');
-video.id = "myVideo"; // Kept old ID for CSS compatibility
+video.id = "myVideo";
 video.loop = true;
 video.muted = true;
 video.playsInline = true;
@@ -88,11 +91,14 @@ async function loadExternalConfig() {
                         videoFiles[key] = json.videoFiles[key];
                     }
                 }
-                console.info('ANIMATED-BACKGROUNDS: External config.json loaded.');
+                console.info('ANIMATED-BACKGROUNDS: External config.json loaded successfully.');
             }
+        } else {
+            // Fängt den 404-Pfad logisch ab, falls die Datei optional nicht existiert
+            console.info('ANIMATED-BACKGROUNDS: No optional config.json found. Using built-in defaults.');
         }
     } catch (e) {
-        console.info('ANIMATED-BACKGROUNDS: No config.json found. Using defaults.');
+        console.warn('ANIMATED-BACKGROUNDS: Error parsing config.json. Using defaults.', e);
     }
 }
 
@@ -141,7 +147,7 @@ function getVideoConfig(weatherState) {
 
                 // Keep special handling for camera views (e.g. disable autoplay)
                 if (urlKeyword === "cam") {
-                    config.autoplay = !lowPowerMode; // Fallback to older logic if lowPowerMode is on
+                    config.autoplay = !lowPowerMode;
                 }
                 return config;
             }

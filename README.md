@@ -9,7 +9,7 @@ This script is completely universal. You no longer need to modify the JavaScript
 * [📜 Foreword & Evolution](#foreword)
 * [🚀 Features](#features)
 * [📦 Installation](#install)
-* [⚙️ The Magic Configuration (config.json))](#config)
+* [⚙️ The Magic Configuration (config.json and Home Assistant Helpers))](#config)
 * [🎨 Theme Modifications (Making it transparent)](#themes)
 * [📜 Closing Words](#closing_words)
 
@@ -62,7 +62,7 @@ And here we are now... A perfectly fine working alternative with not all, but mo
 6. **Optional:** Create a folder named config/www/animated_backgrounds/ to store your local video files.
 7. Restart Home Assistant or reload the core configuration.
 
-## <a name="config"></a>⚙️ The Magic Configuration (config.json)
+## <a name="config"></a>⚙️ The Magic Configuration (config.json and Home Assistant Helpers)
 
 To supply your own videos or set up specific pages, create a file named config.json and place it right inside your video directory (www/animated_backgrounds/config.json).
 
@@ -90,46 +90,55 @@ JSON
 **How does Dynamic Page Routing work?**
 If a user opens a dashboard tab with the URL /dashboard-main/wallbox, the script scans the JSON keys starting with page-. It detects page-wallbox, matches the keyword wallbox against the current URL, and immediately switches the background to your specified wallbox loops. The moment you navigate away to a standard page, it instantly reverts back to the default weather or random rotation!
 
+**Optional Home Assistant Helpers**
+
+The script automatically checks for predefined helpers in Home Assistant. If these entities do not exist on your system, the script seamlessly falls back to its internal default values. No modifications to the JavaScript code are required.
+
+| Function | Entity Type | Default Entity ID | Description |
+| :--- | :--- | :--- | :--- |
+| **Weather Control** | `input_boolean` | `input_boolean.animated_backgrounds_weather_control` | **On:** Backgrounds change dynamically based on the current weather state.<br>**Off:** Only random videos from the `random` list will be played. |
+| **Use Local Files** | `input_boolean` | `input_boolean.animated_backgrounds_use_local` | **On:** Uses local files under `/local/animated_backgrounds/` for weather states as well.<br>**Off:** Loads weather videos efficiently from the Flixel CDN. |
+| **Switch Interval** | `input_number` | `input_number.animated_backgrounds_video_switch_period` | Defines the interval in seconds after which a new random video is selected from the active list (e.g., `180` for 3 minutes). |
 
 **The manual way**
 If you look at the script with a fitting editor you can see the starting section has a few settings you can tinker with and by doing so, change the default settings without the need to a config.
 All of them are being explained now:
 
-### const weatherEntity_:
+### const weatherEntity_ = "weather.forecast_home";
 
-Needed if you want to use the weather depending backgrounds. I chose my default one here. "weather.home" The state of this entity controls the backgrounds that are being used.
+Needed if you want to use the weather depending backgrounds. I chose the Home Assistant default one here. "weather.forecast_home" The state of this entity controls the backgrounds that are being used.
 
-### const localVideoPath_:
+### const localVideoPath_ = "/local/animated_backgrounds"
 
-Path to your videos. I have my whole bunch on my Home Assistant hardware, but you can select a URL here, too. For convenience I put the correct one for the flixel.com hosted images used by Villhellm's addin here in commented out form there aswell. Remove the // and put them before the local folder instead. The flixel.com videos are already in the lists we talk about below.  
+Path to your locally saved videos. I have my whole bunch on my Home Assistant hardware, but you can decide if you use local files or videos coming from flixel.com. By default this path does not do anything unless you change "weatherControl_" aka "input_boolean.animated_backgrounds_weather_control" or "weatherUseLocal_" aka "input_boolean.animated_backgrounds_use_local". Otherwise the videos will be taken from flixel.com. For convenience I put the correct paths for the flixel.com hosted videos used by Villhellm's addin here aswell. The flixel.com videos are already in the lists we talk about below.
 
-### const flixelVideoPath_:
+### const flixelVideoPath_ = "https://cdn.flixel.com/flixel";
 
 Keep as it is, unless flixel changes stuff on their website! This one is needed to create a working flixel.com video-link!
 
-### let weatherControl_:
+### let weatherControl_ = true;
 
-If a pure randomizer is needed, set it to false. For weather based randomizer, set it to true.
+If a pure randomizer is needed, set it to false. For weather based randomizer, leave it set to true.
 
-### let weatherUseLocal_:
+### let weatherUseLocal_ = false;
 
-Allows you to choose if the weather videos should come from flixel.com or local folders.
+Allows you to choose if the weather videos should come from flixel.com or local folders, keep default if you just want animated backgrounds and have no videos prepared at all.
 
-### let videoSwitchPeriod_:
+### let videoSwitchPeriod_ = 180;
 
 After x seconds, the video will be diced again. This verifies the weather is still the same, too. Otherwise the dice will check the now correct file list.
 
-### const weatherControlHelper_ = "";
+### const weatherControlHelper_ = "input_boolean.animated_backgrounds_weather_control";
 
-Here you can put a name for a Helper inside Home Assistant, like "input_boolean.background_weather_control". The value you give it will then be applied to "weatherControl_" above.
+Here you can put a name for a Helper inside Home Assistant, like the default "input_boolean.animated_backgrounds_weather_control". The value you give it in Home Assistant will then be applied to "weatherControl_" above.
 
-### const weatherUseLocalHelper_ = "";
+### const weatherUseLocalHelper_ = "input_boolean.animated_backgrounds_use_local";
 
-Here you can put a name for a Helper inside Home Assistant, like "input_boolean.background_weather_uselocal". The value you give it will then be applied to "weatherUseLocal_" above.
+Here you can put a name for a Helper inside Home Assistant, like the default "input_boolean.animated_backgrounds_use_local". The value you give it in Home Assistant will then be applied to "weatherUseLocal_" above.
 
-### const videoSwitchPeriodHelper_ = "";
+### const videoSwitchPeriodHelper_ = "input_number.animated_backgrounds_video_switch_period";
 
-Here you can put a name for a Helper inside Home Assistant, like "input_number.background_video_switch_period". The value you give it will then be applied to "videoSwitchPeriod_" above.
+Here you can put a name for a Helper inside Home Assistant, like the default "input_number.animated_backgrounds_video_switch_period". The value you give it in Home Assistant will then be applied to "videoSwitchPeriod_" above.
 
 ### const slowDeviceUserAgent = "Kindle";
 
@@ -137,7 +146,7 @@ Allows to add a device type as a exception to never playback videos and always s
 
 ### const lowPowerMode = false;
 
-Always forces videos to never playback and always show in paused state.
+Always forces videos to never playback and always show in paused state. Default is not using it.
 
 ### let videoFiles:
 
