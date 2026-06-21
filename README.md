@@ -9,9 +9,11 @@ This script is completely universal. You no longer need to modify the JavaScript
 * [📜 Foreword & Evolution](#foreword)
 * [🚀 Features](#features)
 * [📦 Installation](#install)
-* [⚙️ The Magic Configuration (config.json and Home Assistant Helpers))](#config)
+* [⚙️ The Magic Configuration (config.json and Home Assistant Helpers)](#config)
 * [🎨 Theme Modifications (Making it transparent)](#themes)
+* [🐒 TamperMonkey Scripts (Making even more transparent)](#tampermonkey-scripts)
 * [📜 Closing Words](#closing_words)
+* [📸 Screenshots](#screenshots)
 
 ## <a name="foreword"></a>📜 Foreword & Evolution
 
@@ -32,22 +34,22 @@ Now I thought I should extend the script a bit. Like, make it more user friendly
 And here we are now... A perfectly fine working alternative with not all, but most features the addin had, too. What started as a quick theme hack has now evolved into a highly optimized, fully-fledged background engine. You no longer have to maintain different script variations or touch a single line of JavaScript code just because you added a new dashboard tab. This one handles everything dynamically.
 
 ## <a name="features"></a>🚀 Features
-**Zero Code Modification:**<br/>
+🛠️ **Zero Code Modification:**<br/>
 Install it once, control everything else through a separate JSON configuration file.
 
-**Dynamic Page Routing:**<br/>
+🔀 **Dynamic Page Routing:**<br/>
 Simply add a list with the prefix page-your-tab in your JSON, and the script automatically switches to those videos whenever the URL path contains /your-tab.
 
-**Codec-Mix (MP4 & WebM):**<br/>
+🎞️ **Codec-Mix (MP4 & WebM):**<br/>
 The script dynamically detects the MIME-type on every single video change. You can freely mix .mp4 and .webm files inside the very same list.
 
-**Instant Cache-Busting:**<br/>
+⚡ **Instant Cache-Busting:**<br/>
 The configuration file is fetched with a cache-busting timestamp. Any updates to your video lists are active immediately after a page refresh—no more manual browser cache purging!
 
-**No Long-Term Tokens Needed:**<br/>
+🔒 **No Long-Term Tokens Needed:**<br/>
 The script safely communicates directly with the native Home Assistant frontend DOM object to fetch states, removing the old requirement for manual long-term access tokens.
 
-**Home Assistant Helper Support:**<br/>
+🎛️ **Home Assistant Helper Support:**<br/>
 Toggle weather control, switch between local/CDN paths, or adjust the video rotation interval in real-time using native input_boolean or input_number entities directly from your UI.
 
 ## <a name="install"></a>📦 Installation
@@ -111,51 +113,51 @@ The script automatically checks for predefined helpers in Home Assistant. If the
 If you look at the script with a fitting editor you can see the starting section has a few settings you can tinker with and by doing so, change the default settings without the need to a config.
 All of them are being explained now:
 
-### const weatherEntity_ = "weather.forecast_home";
+### 🌐 const weatherEntity_ = "weather.forecast_home";
 
 Needed if you want to use the weather depending backgrounds. I chose the Home Assistant default one here. "weather.forecast_home" The state of this entity controls the backgrounds that are being used.
 
-### const localVideoPath_ = "/local/animated_backgrounds"
+### 📂 const localVideoPath_ = "/local/animated_backgrounds"
 
 Path to your locally saved videos. I have my whole bunch on my Home Assistant hardware, but you can decide if you use local files or videos coming from flixel.com. By default this path does not do anything unless you change "weatherControl_" aka "input_boolean.animated_backgrounds_weather_control" or "weatherUseLocal_" aka "input_boolean.animated_backgrounds_use_local". Otherwise the videos will be taken from flixel.com. For convenience I put the correct paths for the flixel.com hosted videos used by Villhellm's addin here aswell. The flixel.com videos are already in the lists we talk about below.
 
-### const flixelVideoPath_ = "https://cdn.flixel.com/flixel";
+### 🔗 const flixelVideoPath_ = "https://cdn.flixel.com/flixel";
 
 Keep as it is, unless flixel changes stuff on their website! This one is needed to create a working flixel.com video-link!
 
-### let weatherControl_ = true;
+### 🔄 let weatherControl_ = true;
 
 If a pure randomizer is needed, set it to false. For weather based randomizer, leave it set to true.
 
-### let weatherUseLocal_ = false;
+### 🏠 let weatherUseLocal_ = false;
 
 Allows you to choose if the weather videos should come from flixel.com or local folders, keep default if you just want animated backgrounds and have no videos prepared at all.
 
-### let videoSwitchPeriod_ = 180;
+### ⏱️ let videoSwitchPeriod_ = 180;
 
 After x seconds, the video will be diced again. This verifies the weather is still the same, too. Otherwise the dice will check the now correct file list.
 
-### const weatherControlHelper_ = "input_boolean.animated_backgrounds_weather_control";
+### 🎛️ const weatherControlHelper_ = "input_boolean.animated_backgrounds_weather_control";
 
 Here you can put a name for a Helper inside Home Assistant, like the default "input_boolean.animated_backgrounds_weather_control". The value you give it in Home Assistant will then be applied to "weatherControl_" above.
 
-### const weatherUseLocalHelper_ = "input_boolean.animated_backgrounds_use_local";
+### 🛠️ const weatherUseLocalHelper_ = "input_boolean.animated_backgrounds_use_local";
 
 Here you can put a name for a Helper inside Home Assistant, like the default "input_boolean.animated_backgrounds_use_local". The value you give it in Home Assistant will then be applied to "weatherUseLocal_" above.
 
-### const videoSwitchPeriodHelper_ = "input_number.animated_backgrounds_video_switch_period";
+### 🔢 const videoSwitchPeriodHelper_ = "input_number.animated_backgrounds_video_switch_period";
 
 Here you can put a name for a Helper inside Home Assistant, like the default "input_number.animated_backgrounds_video_switch_period". The value you give it in Home Assistant will then be applied to "videoSwitchPeriod_" above.
 
-### const slowDeviceUserAgent = "Kindle";
+### 📱 const slowDeviceUserAgent = "Kindle";
 
 Allows to add a device type as a exception to never playback videos and always show them paused. The value is compared to the user agent of the devices loading the Home Assistant websites. The default case are Amazon Kindles.
 
-### const lowPowerMode = false;
+### 🔋 const lowPowerMode = false;
 
 Always forces videos to never playback and always show in paused state. Default is not using it.
 
-### let videoFiles:
+### 📁 let videoFiles:
 
 Below that you can find a longer list of video names.
 
@@ -218,8 +220,80 @@ Most of the UIX code is commented what it was made for. Have fun doing crazy thi
 ### ⚠️ WARNING:
 Theme changes will not take effect immediately. Go to the Developer Tools -> Services tab in Home Assistant and run the service frontend.reload_themes to force-refresh the styling!
 
+## <a name="tampermonkey-scripts"></a>🐒 TamperMokey Scripts (Making even more transparent)
+
+# TamperMoney Scripts for Music Assistant and HACS
+
+If you want to have some nice Backgrounds inside Music Assistant and HACS, too... You have to use TamperMonkey.
+Why? Because iFrames suck!!! There is absolutely NO WAY AT ALL, NEVR; EVER; NULL AND NADA to change anything inside these with the default tricks you have with UIX and themes.
+
+Even worse.. HACS is even more evil and if you tinker with the background stuff inside TamperMonkey you will get a sweet white-yellow'ish background an no Video running at all! To "fix" this we have to use opacity and make the whole thing semi-transparent. There is NO OTHER WAY!
+
+Luckily Music Assistant is another caliber and happily applies the background if we remove some layers with TamperMonkey's help.
+
+Here some nice pics:
+
+**HACS**
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dreimer1986/ha_animated_backgrounds/refs/heads/master/TamperMonkey-Scripts/assets/hacs.webp" alt="HACS" width="100%">
+</p>
+
+**Music Assistant**
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dreimer1986/ha_animated_backgrounds/refs/heads/master/TamperMonkey-Scripts/assets/music-assistant.webp" alt="Music Assistant" width="100%">
+</p>
+
 ## <a name="closing_words"></a>📜 Closing Words
 
 All my stuff here is licensed under MIT license. You can use it for whatever you see it fit. But if you use stuff from me, then at least mention my name. That's all I ask for. ^^
 
 Have fun tweaking your smart home and feeding your dashboards with beautiful backgrounds! 😎
+
+## <a name="screenshots"></a>📸 Screenshots
+
+These are the very same pics shown on my own Modified Theme Repo: https://github.com/dreimer1986/yourname_uix
+
+**Kataware-doki**
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dreimer1986/yourname_uix/refs/heads/master/assets/kataware-doki-home-overview.webp" alt="Kataware-doki - Home overview">
+</p>
+
+**Tiamat**
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dreimer1986/yourname_uix/refs/heads/master/assets/tiamat-home-overview.webp" alt="Tiamat - Home overview">
+</p>
+
+**Original**
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dreimer1986/yourname_uix/refs/heads/master/assets/original-home-overview.webp" alt="Original - Home overview">
+</p>
+
+**Kataware-doki - Settings - About**
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dreimer1986/yourname_uix/refs/heads/master/assets/kataware-doki-settings-about.webp" alt="Kataware-doki - Settings - About">
+</p>
+
+**Tiamat - Settings - About**
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dreimer1986/yourname_uix/refs/heads/master/assets/tiamat-settings-about.webp" alt="Tiamat - Settings - About">
+</p>
+
+**Original - Settings - About**
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dreimer1986/yourname_uix/refs/heads/master/assets/original-settings-about.webp" alt="Original - Settings - About">
+</p>
+
+**Kataware-doki - Mobile**
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dreimer1986/yourname_uix/refs/heads/master/assets/kataware-doki-mobile.webp" alt="Kataware-doki - Mobile version" width="50%">
+</p>
+
+**Tiamat - Mobile**
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dreimer1986/yourname_uix/refs/heads/master/assets/tiamat-mobile.webp" alt="Tiamat - Mobile version" width="50%">
+</p>
+
+**Original - Mobile**
+<p align="center">
+  <img src="https://raw.githubusercontent.com/dreimer1986/yourname_uix/refs/heads/master/assets/original-mobile.webp" alt="Original - Mobile version" width="50%">
+</p>
