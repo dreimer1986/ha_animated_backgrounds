@@ -16,5 +16,5 @@ Here some nice pics:
 
 **Music Assistant**
 <p align="center">
-  <img src="https://raw.githubusercontent.com/dreimer1986/ha_animated_backgrounds/refs/heads/master/TamperMonkey-Scripts/assets/music-asssistant.webp" alt="Music Assistant" width="100%">
+  <img src="https://raw.githubusercontent.com/dreimer1986/ha_animated_backgrounds/refs/heads/master/TamperMonkey-Scripts/assets/music-assistant.webp" alt="Music Assistant" width="100%">
 </p>
