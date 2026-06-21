@@ -4,8 +4,9 @@
 // @version      1.0
 // @description  Hangelt sich durch den Shadow-DOM-Baum, um HACS transparent zu machen
 // @author       Daniel Reimer
-// @match        https://ha.dreimer.de/hacs/*
-// @match        https://192.168.181.42:8123/hacs/*
+// @match        https://ha.xyz.de/hacs/*
+// @match        http://192.168.181.42:8123/hacs/*
+// @match        http://homeassistant.local:8123/hacs/*
 // @grant        none
 // @run-at       document-end
 // ==/UserScript==

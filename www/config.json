@@ -1,0 +1,20 @@
+{
+  "videoFiles": {
+    "clear-night": ["helderenacht/21.mp4", "helderenacht/22.mp4", "helderenacht/24.mp4", "helderenacht/1.mp4"],
+    "cloudy": ["bewolkt/1.mp4", "bewolkt/11.mp4", "bewolkt/13.mp4", "bewolkt/14.mp4", "bewolkt/15.mp4", "bewolkt/16.mp4", "bewolkt/17.mp4", "bewolkt/18.mp4", "bewolkt/19.mp4", "bewolkt/sunsetsea2.mp4", "bewolkt/20.mp4", "bewolkt/21.mp4", "bewolkt/bewolkt.mp4", "bewolkt/bewolkt1.mp4", "bewolkt/bewolkt2.mp4", "bewolkt/zwaarbewolkt.mp4"],
+    "fog": ["mist/26.mp4", "mist/25.mp4"],
+    "hail": ["hail/Hail1.mp4", "hail/Hail2.mp4", "hail/Hail3.mp4"],
+    "lightning": ["bliksem/1.mp4", "bliksem/2.mp4"],
+    "lightning-rainy": ["bliksem_regen/1.mp4", "bliksem_regen/2.mp4"],
+    "partlycloudy": ["lichtbewolkt/6.mp4", "lichtbewolkt/7.mp4", "lichtbewolkt/8.mp4", "lichtbewolkt/9.mp4", "lichtbewolkt/10.mp4", "lichtbewolkt/11.mp4", "lichtbewolkt/sunset_sea.mp4"],
+    "pouring": ["regen/27.mp4", "regen/25.mp4"],
+    "rainy": ["regen/27.mp4", "regen/25.mp4"],
+    "snowy": ["winter/1.mp4", "winter/snow.mp4", "winter/2.mp4", "winter/3.mp4"],
+    "snowy-rainy": ["winter/1.mp4", "winter/snow.mp4", "winter/2.mp4", "winter/3.mp4"],
+    "sunny": ["zonnig/1.mp4", "zonnig/3.mp4", "zonnig/4.mp4", "zonnig/5.mp4", "zonnig/water_sunny_day1.mp4", "zonnig/water_sunny_day.mp4", "zonnig/sunny1.mp4"],
+    "windy": ["wind/1.mp4", "wind/2.mp4", "wind/3.mp4"],
+    "windy-variant": ["veel_wind/1.mp4", "veel_wind/2.mp4", "veel_wind/3.mp4"],
+    "exceptional": ["exception/Exception1.mp4", "exception/Exception2.mp4", "exception/Exception3.mp4"]
+  }
+}
+

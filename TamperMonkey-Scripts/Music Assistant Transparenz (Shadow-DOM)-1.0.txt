@@ -4,8 +4,9 @@
 // @version      1.0
 // @description  Schaltet die internen Vuetify-Variablen von Music Assistant auf transparent
 // @author       Daniel Reimer
-// @match        https://ha.dreimer.de/d5369777_music_assistant_beta
-// @match        https://192.168.181.42:8123/d5369777_music_assistant_beta
+// @match        https://ha.xyz.de/d5369777_music_assistant_beta
+// @match        http://192.168.181.42:8123/d5369777_music_assistant_beta
+// @match        http://homeassistant.local:8123/d5369777_music_assistant_beta
 // @grant        none
 // @run-at       document-end
 // ==/UserScript==
