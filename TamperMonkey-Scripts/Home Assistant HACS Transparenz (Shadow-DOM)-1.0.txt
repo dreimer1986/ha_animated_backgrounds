@@ -1,0 +1,28 @@
+// ==UserScript==
+// @name         Home Assistant HACS Transparenz (Shadow-DOM)
+// @namespace    http://tampermonkey.net
+// @version      1.0
+// @description  Hangelt sich durch den Shadow-DOM-Baum, um HACS transparent zu machen
+// @author       Daniel Reimer
+// @match        https://ha.dreimer.de/hacs/*
+// @match        https://192.168.181.42:8123/hacs/*
+// @grant        none
+// @run-at       document-end
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    function setHacsOpacity() {
+        // 1. Wir starten bei der absoluten Wurzel der Seite
+        const iframe = document.querySelector("body > home-assistant").shadowRoot.querySelector("home-assistant-main").shadowRoot.querySelector("ha-drawer > partial-panel-resolver > ha-panel-custom > iframe.loaded")
+
+        // 5. Wenn das iFrame exakt gefunden wurde, schreiben wir die Opacity auf 0.33 um
+        if (iframe.style.opacity !== '0.75') {
+            iframe.style.setProperty('opacity', '0.75', 'important');
+        }
+    }
+
+    // Das Skript prüft alle 1,5 Sekunden, ob das iFrame existiert und hält den Wert fest
+    setInterval(setHacsOpacity, 1500);
+})();

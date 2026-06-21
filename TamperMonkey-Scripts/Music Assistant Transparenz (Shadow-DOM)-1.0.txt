@@ -1,0 +1,67 @@
+// ==UserScript==
+// @name         Music Assistant Transparenz (Shadow-DOM)
+// @namespace    http://tampermonkey.net
+// @version      1.0
+// @description  Schaltet die internen Vuetify-Variablen von Music Assistant auf transparent
+// @author       Daniel Reimer
+// @match        https://ha.dreimer.de/d5369777_music_assistant_beta
+// @match        https://192.168.181.42:8123/d5369777_music_assistant_beta
+// @grant        none
+// @run-at       document-end
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    function forceUltimateTransparency() {
+        try {
+            const iframe = document.querySelector("body > home-assistant").shadowRoot.querySelector("home-assistant-main").shadowRoot.querySelector("ha-drawer > partial-panel-resolver > ha-panel-app").shadowRoot.querySelector("iframe")
+
+            if (iframe && iframe.contentDocument) {
+                const iframeDoc = iframe.contentDocument;
+
+                const allElements = iframeDoc.querySelectorAll('.v-theme--dark, .v-theme--light, [class*="v-theme--"], html, body');
+                allElements.forEach(el => {
+                    el.style.setProperty('--v-theme-background', '0, 0, 0, 0', 'important');
+                    el.style.setProperty('--v-theme-surface', '0, 0, 0, 0', 'important');
+                });
+
+                if (!iframeDoc.getElementById('ultimate-ma-transparent-override')) {
+                    const style = iframeDoc.createElement('style');
+                    style.id = 'ultimate-ma-transparent-override';
+                    style.innerHTML = `
+                        /* Hebelt die CSS-Variablen im gesamten iFrame-System aus */
+                        :root, html, body, .v-application, .v-application__wrap {
+                            --v-theme-background: 0, 0, 0, 0 !important;
+                            --v-theme-surface: 0, 0, 0, 0 !important;
+                        }
+
+                        main.main-layout,
+                        main[data-slot="sidebar-inset"],
+                        .bg-background,
+                        .bg-sidebar,
+                        .content-section,
+                        .ed-discover,
+                        .ed-discover > div,
+                        .sidebar-wrapper,
+                        [data-slot="sidebar"] {
+                            background: transparent !important;
+                            --v-theme-background: 0, 0, 0, 0 !important;
+                        }
+
+                        .v-card, .v-sheet, .v-list {
+                            box-shadow: none !important;
+                        }
+                    `;
+                    iframeDoc.head.appendChild(style);
+                }
+            }
+        } catch (e) {
+            // Schützt die Konsole vor Fehlern beim Laden
+        }
+    }
+
+    // Sehr schnelles Intervall (alle 300ms), um dem Rendern zuvorzukommen
+    setInterval(forceUltimateTransparency, 300);
+    forceUltimateTransparency();
+})();
