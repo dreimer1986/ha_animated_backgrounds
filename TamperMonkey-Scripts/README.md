@@ -1,4 +1,4 @@
-# TamperMoney Scripts for Music Assistant and HACS
+# 🐒 TamperMoney Scripts for Music Assistant and HACS
 
 If you want to have some nice Backgrounds inside Music Assistant and HACS, too... You have to use TamperMonkey.
 Why? Because iFrames suck!!! There is absolutely NO WAY AT ALL, NEVR; EVER; NULL AND NADA to change anything inside these with the default tricks you have with UIX and themes.
