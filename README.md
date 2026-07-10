@@ -17,9 +17,9 @@ This script is completely universal. You no longer need to modify the JavaScript
 
 ## <a name="foreword"></a>📜 Foreword & Evolution
 
-After Home Assistant 2023.04 went final many ppl found out that "Animated Lovelace Background" by Villhellm is not working anymore. As I used this addin for a while now, I had a lil tantrum in the 2023.04 beta time... I opened a report right on realization of the problems in Villhellm's repo. I hoped for someone else to fix it as we all know Villhellm has passed away and I never before did much JS coding... Soon there were the needed information made public in #beta what to do for fixing all kind of custom addons. In the end, with some useless sidesteps in JS Script form, I myself fixed it and it worked again. I even have a own fork with the fix included. Some obsolete section needed to be removed and the fix from #beta did the rest.
+After Home Assistant 2023.04 went final many people found out that "Animated Lovelace Background" by Villhellm is not working anymore. As I used this addin for a while now, I had a lil tantrum in the 2023.04 beta time... I opened a report right on realization of the problems in Villhellm's repo. I hoped for someone else to fix it as we all know Villhellm has passed away and I never before did much JS coding... Soon, the needed information was made public in #beta what to do for fixing all kind of custom addons. In the end, with some useless sidesteps in JS Script form, I myself fixed it and it worked again. I even have an own fork with the fix included. Some obsolete sections needed to be removed and the fix from #beta did the rest.
 
-So... why did you make your own solution then you ask? I did quite some messed up things with the addin including the sidebar being transparent on my own theme ([Here is it's repo](https://github.com/dreimer1986/yourname_uix) btw ^^). This is not working anymore at all with the current way the addin injects the video into the website.
+So... why did you make your own solution then you ask? I did quite some messed up things with the addin including the sidebar being transparent on my own theme ([Here is its repo](https://github.com/dreimer1986/yourname_uix) btw ^^). This is not working anymore at all with the current way the addin injects the video into the website.
 
 You can imagine the website as a tree. Down at the roots is "body" and from there you have different sections with different sub-sections etc. etc. creating the website you see. In the past the sidebar was a sub branch of the dashboard, now both are on the same level. Look wise not much of a difference, but a modified dashboard now cannot modify the look of the sidebar anymore. That was a feature I wanted so badly in the past and I did not fight for so long to get it working just to give up now.
 
@@ -29,7 +29,7 @@ Playing a video on a website as background is no witchcraft and so I slowly exte
 
 Here my own theme came in handy. I had to modify a few global values and things looked fine. I even removed a few UIX theme hacks and switched to a proper solution in the theme data itself. The result was... WONDERFUL! No flickering, no sometimes not playing video, no short periods showing up the original background image... ALL WAS JUST FINE!
 
-Now I thought I should extend the script a bit. Like, make it more user friendly to modify for our yown needs and add a few neat features maybe. The randomizer was the first step, it got extended to not expect videos to be numbered 1.mp4-x.mp4 but use a random video regardless of the naming. Then I thought about adding the weather depenYou are inding background feature from Villhellm's addin, too.
+Now I thought I should extend the script a bit. Like, make it more user friendly to modify for our own needs and add a few neat features maybe. The randomizer was the first step, it got extended to not expect videos to be numbered 1.mp4-x.mp4 but use a random video regardless of the naming. Then I thought about adding the weather depending background feature from Villhellm's addin, too.
 
 And here we are now... A perfectly fine working alternative with not all, but most features the addin had, too. What started as a quick theme hack has now evolved into a highly optimized, fully-fledged background engine. You no longer have to maintain different script variations or touch a single line of JavaScript code just because you added a new dashboard tab. This one handles everything dynamically.
 
@@ -59,16 +59,15 @@ Toggle weather control, switch between local/CDN paths, or adjust the video rota
 3. Add a new resource:
    URL: /local/styles.js?v=1.5
    Resource type: JavaScript-Modul
-4. Open your configuration.yaml and append the script to your frontend section:
-5. Add /local/styles.js?v=1.5 to the frontend section:
+4. Open your configuration.yaml and add the script to your frontend section like this:
 ```yaml
    frontend:
      extra_module_url:
        - /local/styles.js?v=1.5
 ```
 
-6. **Optional:** Create a folder named config/www/animated_backgrounds/ to store your local video files.
-7. Restart Home Assistant or reload the core configuration.
+5. **Optional:** Create a folder named config/www/animated_backgrounds/ to store your local video files.
+6. Restart Home Assistant or reload the core configuration.
 
 ## <a name="config"></a>⚙️ The Magic Configuration (config.json and Home Assistant Helpers)
 
@@ -110,7 +109,7 @@ The script automatically checks for predefined helpers in Home Assistant. If the
 | **Switch Interval** | `input_number` | `input_number.animated_backgrounds_video_switch_period` | Defines the interval in seconds after which a new random video is selected from the active list (e.g., `180` for 3 minutes). |
 
 **The manual way**<br/>
-If you look at the script with a fitting editor you can see the starting section has a few settings you can tinker with and by doing so, change the default settings without the need to a config.
+If you look at the script with a fitting editor you can see the starting section has a few settings you can tinker with and by doing so, change the default settings without the need for a config.
 All of them are being explained now:
 
 ### 🌐 const weatherEntity_ = "weather.forecast_home";
@@ -119,7 +118,7 @@ Needed if you want to use the weather depending backgrounds. I chose the Home As
 
 ### 📂 const localVideoPath_ = "/local/animated_backgrounds"
 
-Path to your locally saved videos. I have my whole bunch on my Home Assistant hardware, but you can decide if you use local files or videos coming from flixel.com. By default this path does not do anything unless you change "weatherControl_" aka "input_boolean.animated_backgrounds_weather_control" or "weatherUseLocal_" aka "input_boolean.animated_backgrounds_use_local". Otherwise the videos will be taken from flixel.com. For convenience I put the correct paths for the flixel.com hosted videos used by Villhellm's addin here aswell. The flixel.com videos are already in the lists we talk about below.
+Path to your locally saved videos. I have my whole collection on my Home Assistant hardware, but you can decide if you use local files or videos coming from flixel.com. By default this path does not do anything unless you change "weatherControl_" aka "input_boolean.animated_backgrounds_weather_control" or "weatherUseLocal_" aka "input_boolean.animated_backgrounds_use_local". Otherwise the videos will be taken from flixel.com. For convenience I put the correct paths for the flixel.com hosted videos used by Villhellm's addin here aswell. The flixel.com videos are already in the lists we talk about below.
 
 ### 🔗 const flixelVideoPath_ = "https://cdn.flixel.com/flixel";
 
@@ -169,7 +168,7 @@ ONLY used if weatherControl_: true; AND you set "let weatherUseLocal_ = false;" 
 
 ### Sidenote
 
-If you change anything on your settings inside the script after installation, go to the the Dashboard Ressources Settings again and edit the number on "/local/styles.js?v=" to something different than before. This will force a Cache reset on it and really activate your updates.
+If you change anything on your settings inside the script after installation, go to the the Dashboard Resources Settings again and edit the number on "/local/styles.js?v=" to something different than before. This will force a Cache reset on it and really activate your updates.
 
 **OR YOU JUST USE THE CONFIG.JSON!**
 
@@ -220,14 +219,14 @@ Most of the UIX code is commented what it was made for. Have fun doing crazy thi
 ### ⚠️ WARNING:
 Theme changes will not take effect immediately. Go to the Developer Tools -> Services tab in Home Assistant and run the service frontend.reload_themes to force-refresh the styling!
 
-## <a name="tampermonkey-scripts"></a>🐒 TamperMokey Scripts (Making even more transparent)
+## <a name="tampermonkey-scripts"></a>🐒 TamperMonkey Scripts (Making even more transparent)
 
-# TamperMoney Scripts for Music Assistant and HACS
+# TamperMonkey Scripts for Music Assistant and HACS
 
 If you want to have some nice Backgrounds inside Music Assistant and HACS, too... You have to use TamperMonkey.
-Why? Because iFrames suck!!! There is absolutely NO WAY AT ALL, NEVR; EVER; NULL AND NADA to change anything inside these with the default tricks you have with UIX and themes.
+Why? Because iFrames suck!!! There is absolutely NO WAY AT ALL, NEVER, EVER, NULL AND NADA to change anything inside these with the default tricks you have with UIX and themes.
 
-Even worse.. HACS is even more evil and if you tinker with the background stuff inside TamperMonkey you will get a sweet white-yellow'ish background an no Video running at all! To "fix" this we have to use opacity and make the whole thing semi-transparent. There is NO OTHER WAY!
+Even worse.. HACS is even more evil and if you tinker with the background stuff inside TamperMonkey you will get a sweet white-yellow'ish background and no Video running at all! To "fix" this we have to use opacity and make the whole thing semi-transparent. There is NO OTHER WAY!
 
 Luckily Music Assistant is another caliber and happily applies the background if we remove some layers with TamperMonkey's help.
 
