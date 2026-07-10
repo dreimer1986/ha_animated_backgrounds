@@ -29,7 +29,7 @@ Playing a video on a website as background is no witchcraft and so I slowly exte
 
 Here my own theme came in handy. I had to modify a few global values and things looked fine. I even removed a few UIX theme hacks and switched to a proper solution in the theme data itself. The result was... WONDERFUL! No flickering, no sometimes not playing video, no short periods showing up the original background image... ALL WAS JUST FINE!
 
-Now I thought I should extend the script a bit. Like, make it more user friendly to modify for our yown needs and add a few neat features maybe. The randomizer was the first step, it got extended to not expect videos to be numbered 1.mp4-x.mp4 but use a random video regardless of the naming. Then I thought about adding the weather depeding background feature from Villhellm's addin, too.
+Now I thought I should extend the script a bit. Like, make it more user friendly to modify for our yown needs and add a few neat features maybe. The randomizer was the first step, it got extended to not expect videos to be numbered 1.mp4-x.mp4 but use a random video regardless of the naming. Then I thought about adding the weather depenYou are inding background feature from Villhellm's addin, too.
 
 And here we are now... A perfectly fine working alternative with not all, but most features the addin had, too. What started as a quick theme hack has now evolved into a highly optimized, fully-fledged background engine. You no longer have to maintain different script variations or touch a single line of JavaScript code just because you added a new dashboard tab. This one handles everything dynamically.
 
@@ -60,7 +60,7 @@ Toggle weather control, switch between local/CDN paths, or adjust the video rota
    URL: /local/styles.js?v=1.5
    Resource type: JavaScript-Modul
 4. Open your configuration.yaml and append the script to your frontend section:
-5. Add /local/styles.js?v=1 to the frontend section:
+5. Add /local/styles.js?v=1.5 to the frontend section:
 ```yaml
    frontend:
      extra_module_url:
