@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="de">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Liquid Glass · Theme-Konfigurator</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#101321;color:#f1efff;font:14px system-ui,sans-serif}main{max-width:1600px;margin:auto;padding:36px 28px}h1{font-size:clamp(30px,4vw,46px);letter-spacing:-.04em;margin:12px 0}h2{font-size:17px;font-weight:550;margin:0 0 18px}p{color:#bcbdd3;line-height:1.6}header{margin-bottom:28px}.eyebrow{font-size:11px;letter-spacing:.18em;color:#c8acff}.layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:28px}.editor,.export{padding:22px;background:#191d30;border:1px solid #ffffff15;border-radius:20px}.editor{align-self:start}.presets{display:flex;gap:7px;flex-wrap:wrap}button,select,.upload{font:inherit;color:inherit;border:1px solid #ffffff30;border-radius:12px;padding:8px 12px;background:#252b44;cursor:pointer}button:hover{background:#373453}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #c4a3ff;outline-offset:3px}input{accent-color:#baa3ff}.field{margin-top:22px}.field label{display:flex;justify-content:space-between;gap:10px;align-items:center;font-weight:550}.field code{display:block;color:#b8a4e9;font-size:11px;margin:5px 0 8px;overflow-wrap:anywhere}.field .value{display:flex;gap:12px;align-items:center}.field input[type=range]{width:100%;min-width:40px}.field input[type=number]{width:72px;flex-shrink:0}.field textarea{width:100%;min-height:76px;resize:vertical}.field select{width:100%}input[type=number],textarea{color:#eeeaff;background:#0e1222;border:1px solid #ffffff26;border-radius:8px;padding:8px;font:12px ui-monospace,monospace}.hint{font-size:12px;color:#a5abc7;margin:10px 0;line-height:1.6}.error{color:#ffb4b4;font-size:12px}.preview-tools{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.preview-tools label{display:flex;align-items:center;gap:8px}.upload input{max-width:170px;font-size:11px}.comparison{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}h2 small{display:block;color:#bcbdd3;font-size:12px;font-weight:400;margin-top:6px}.scene{height:430px;position:relative;overflow:hidden;border-radius:24px;background:#243056}.backdrop{position:absolute;inset:-80px;background:repeating-linear-gradient(0deg,transparent 0 23px,#fff6 24px 25px,transparent 26px 48px),repeating-linear-gradient(90deg,transparent 0 23px,#fff6 24px 25px,transparent 26px 48px),radial-gradient(ellipse at 70% 32%,#ffa273 0,transparent 35%),radial-gradient(ellipse at 30% 75%,#6637f0 0,transparent 48%),linear-gradient(125deg,#123f5d,#c65fba);animation:drift 10s ease-in-out infinite alternate}.backdrop:after{content:'GLASS 0123';position:absolute;top:195px;left:105px;font-size:58px;font-weight:700;white-space:nowrap;color:#ffecca}.landscape .backdrop{background:radial-gradient(ellipse at 65% 32%,#ffd89e 0 7%,transparent 8%),linear-gradient(155deg,transparent 53%,#182939 53% 60%,transparent 60%),linear-gradient(25deg,transparent 56%,#34466c 56% 66%,transparent 66%),linear-gradient(#775785,#d99c9f 48%,#344974 49%,#152d48)}.custom-image .backdrop{background-image:var(--preview-image);background-size:cover;background-position:center}.custom-image .backdrop:after,.landscape .backdrop:after{content:''}.pane{position:absolute;left:8%;right:8%;top:52px;height:262px;border-radius:40px;border:1px solid #ffffff50;display:flex;flex-direction:column;justify-content:end;padding:24px;background:#172133}.pane strong{font-size:22px;font-weight:500}.pane span{font-size:12px;margin-top:8px}.row{top:338px;height:66px;border-radius:28px;padding:0 18px;flex-direction:row;align-items:center;justify-content:space-between}.row strong{font-size:13px}.old{--liquid-glass-profile:convex;--liquid-glass-strength:72;--liquid-glass-bevel:48;--liquid-glass-blur:0;--liquid-glass-frost:0}.paused .backdrop{animation-play-state:paused}.export{margin-top:20px}.export-header{display:flex;align-items:center;justify-content:space-between;gap:16px}.export-header h2{margin:0}#yaml{display:block;width:100%;height:238px;resize:vertical;line-height:1.6;white-space:pre}#copy-status{font-size:12px;margin-bottom:0}#status{font-size:12px}@keyframes drift{to{transform:translate(40px,32px)}}@media(prefers-reduced-motion:reduce){.backdrop{animation:none}}@media(max-width:1150px){.layout{grid-template-columns:280px minmax(0,1fr)}.comparison{grid-template-columns:1fr}.old{display:none}}@media(max-width:720px){main{padding:24px 14px}.layout{grid-template-columns:1fr}.editor{order:1}.preview{min-width:0}.export-header{align-items:start}.preview-tools{gap:10px}}
+
+.reference-choice{display:flex;gap:12px;align-items:center;margin-top:20px;flex-wrap:wrap}
+.lens-scene{height:320px;position:relative;overflow:hidden;border-radius:24px;background:#f0edf3;color:#20212b;border:1px solid #ffffff30}
+.reading-sheet{position:absolute;inset:0 0 auto;padding:20px 24px;animation:read-scroll 12s ease-in-out infinite alternate;will-change:transform}
+.architecture{height:118px;border-radius:18px;background:linear-gradient(90deg,transparent 0 28%,#d4c5b4 28% 33%,transparent 33% 65%,#e0cfc0 65% 72%,transparent 72%),linear-gradient(160deg,transparent 60%,#bda589 60%),linear-gradient(90deg,#284438,#70977b 48%,#655955 49%,#b09b85)}
+.reading-sheet h3{font-size:28px;letter-spacing:-.03em;margin:22px 0 12px}.reading-sheet p{font-size:24px;line-height:1.55;color:#262730;margin:12px 0}.ruler{font:30px ui-monospace,monospace;border-top:2px solid #303544;margin-top:20px;padding-top:12px;white-space:nowrap}
+.lens-controls{position:absolute;left:20px;right:20px;top:174px;height:76px;display:flex;gap:14px;align-items:stretch}
+.marble,.search-lens{position:relative;border:1px solid #ffffff80;color:#22232b;background:#ddd;box-shadow:0 8px 20px #17172e24}
+.marble{border-radius:50%;width:76px;height:76px;flex:0 0 76px;padding:0;font:30px system-ui;cursor:default}
+.search-lens{border-radius:999px;flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:0 22px;font:26px system-ui}.search-lens span{font:42px system-ui}
+.paused .reading-sheet{animation-play-state:paused}
+@keyframes read-scroll{0%,12%{transform:translateY(40px)}88%,100%{transform:translateY(-205px)}}
+@media(prefers-reduced-motion:reduce){.reading-sheet{animation:none;transform:translateY(-110px)}}
+@media(max-width:720px){.lens-controls{left:14px;right:14px;gap:10px}.search-lens{padding:0 14px;font-size:22px}.reading-sheet{padding-inline:18px}.reading-sheet p{font-size:22px}}
+
+.text-position{display:flex;align-items:center;gap:12px;margin-top:16px;font-size:12px}.text-position input{width:min(240px,45vw)}.text-position output{min-width:80px;color:#bcbdd3}
+
+</style>
+<body>
+<main>
+<header><span class="eyebrow">HOME ASSISTANT · LIQUID GLASS 0.4</span><h1>Dein Glas. Deine Einstellungen.</h1><p>Wölbung und Milchglas live einstellen. Die Vorschau verwendet dasselbe Modul wie Home Assistant.</p></header>
+<div class="layout">
+<aside class="editor"><h2>Theme-Einstellungen</h2><div class="presets"><button data-preset="marble">Glasmurmel</button><button data-preset="clear">Klarglas</button><button data-preset="milk">Milchglas</button><button data-preset="thick">Extra dick</button></div><p class="hint">Voreinstellungen setzen die Materialwerte zurück. Die mobile Freischaltung bleibt erhalten.</p><form id="settings" onsubmit="return false"></form></aside>
+<div class="preview">
+<div class="preview-tools"><label><input id="motion" type="checkbox" checked> Hintergrund bewegen</label><label>Hintergrund <select id="scene"><option value="grid">Raster & Farben</option><option value="landscape">Abendlicht</option></select></label><label class="upload">Eigenes Bild <input id="image" type="file" accept="image/*"></label></div>
+<label class="text-position">Textposition <input id="text-position" type="range" min="-40" max="205" value="155"><output id="text-position-value">automatisch</output></label>
+<p class="hint">Textposition hält die Animation an und zeigt beide Linsen über derselben Textstelle. Hintergrundwahl und Bewegung dienen nur der Vorschau. Ein eigenes Bild bleibt lokal.</p>
+<label class="reference-choice">Vergleich mit <select id="reference-profile"><option value="convex">Version 0.3 · gewölbter Rand</option><option value="legacy">Version 0.1 · ursprünglicher Rand</option></select></label>
+<div class="comparison">
+<section class="old"><h2>Bisher <small id="reference-label">Version 0.3 · 72 / 48 · ohne Mattierung</small></h2><div class="lens-scene">
+<div class="reading-sheet" aria-hidden="true"><div class="architecture"></div><h3>Die Architektur</h3><p>Licht fällt durch die großen Fenster. Hinter dem Glas wandern Buchstaben und Linien vorbei.</p><p>Runde Formen, klare Konturen und der Blick ins Grüne.</p><div class="ruler">0123456789 · ABCDE</div></div>
+<div class="lens-controls"><button class="marble" data-liquid-glass aria-label="Glasbutton als optisches Testobjekt">☰</button><div class="search-lens" data-liquid-glass><span aria-hidden="true">⌕</span> Suchen</div></div>
+</div><p class="hint">Runder Button & Suchleiste · danach die HA-Karten</p><div class="scene"><div class="backdrop"></div><div class="pane" data-liquid-glass><strong>Wohnzimmer</strong><span>21,4 °C · 48 % Luftfeuchte</span></div><div class="pane row" data-liquid-glass><strong>Rollo Wohnzimmer</strong><span>↑ &nbsp; ■ &nbsp; ↓</span></div></div></section>
+<section id="live"><h2>Dein Theme <small>Alle Werte aus dem Formular</small></h2><div class="lens-scene">
+<div class="reading-sheet" aria-hidden="true"><div class="architecture"></div><h3>Die Architektur</h3><p>Licht fällt durch die großen Fenster. Hinter dem Glas wandern Buchstaben und Linien vorbei.</p><p>Runde Formen, klare Konturen und der Blick ins Grüne.</p><div class="ruler">0123456789 · ABCDE</div></div>
+<div class="lens-controls"><button class="marble" data-liquid-glass aria-label="Glasbutton als optisches Testobjekt">☰</button><div class="search-lens" data-liquid-glass><span aria-hidden="true">⌕</span> Suchen</div></div>
+</div><p class="hint">Runder Button & Suchleiste · danach die HA-Karten</p><div class="scene"><div class="backdrop"></div><div class="pane" data-liquid-glass><strong>Wohnzimmer</strong><span>21,4 °C · 48 % Luftfeuchte</span></div><div class="pane row" data-liquid-glass><strong>Rollo Wohnzimmer</strong><span>↑ &nbsp; ■ &nbsp; ↓</span></div></div><wa-dialog></wa-dialog></section>
+</div>
+<p class="hint">Die Dialogfläche unten rechts zeigt „liquid-glass-dialogs“. Rundungen und Kartenhöhen kommen wie in HA von der jeweiligen Karte. Andere Hintergründe und Karten können anders wirken.</p>
+<section class="export"><div class="export-header"><h2>Ins bestehende Theme übernehmen</h2><button id="copy">YAML kopieren</button></div><p class="hint">Auf gleicher Ebene wie „ha-card-background“ einfügen. Vorhandene gleichnamige Einträge ersetzen.</p><textarea id="yaml" readonly spellcheck="false" aria-label="Theme YAML"></textarea><p id="copy-status" role="status"></p></section>
+<p id="status" role="status">Desktop Chrome / Edge · HA-Modul 0.4.0 · lokal und ohne HA-Verbindung</p>
+</div>
+</div>
+</main>
+<script>
+/** HA Liquid Glass 0.4.0 — experimental desktop Chromium frontend module.
+ * No network requests, dependencies, credentials or HA service calls.
+ * Configure with inherited --liquid-glass-* CSS variables (see INSTALL.md).
+ */
+(() => {
+  'use strict';
+  if (window.haLiquidGlass) return;
+  const VERSION = '0.4.0';
+  const ns = 'http://www.w3.org/2000/svg';
+  const mark = 'data-ha-liquid-glass';
+  const owned = 'data-ha-lg-owned';
+  const roots = new Map(), panes = new Map(), dirty = new Set();
+  let serial = 0, timer, frame, scanTimer, stopped = false;
+  const mobile = /Mobile|Android|iPhone|iPad|iPod/.test(navigator.userAgent);
+  const mobileOverride = new URL(location.href).searchParams.get('liquid_glass_mobile') === 'on';
+  const supported = /(?:Chrome|Chromium|Edg)\//.test(navigator.userAgent) &&
+    CSS.supports('backdrop-filter', 'url("#ha-lg-test")');
+  const off = new URL(location.href).searchParams.get('liquid_glass') === 'off';
+  const css = `
+    [${mark}] {
+      background: linear-gradient(rgb(255 255 255 / clamp(0, var(--liquid-glass-frost, 0), 1)),rgb(255 255 255 / clamp(0, var(--liquid-glass-frost, 0), 1))), var(--liquid-glass-background, linear-gradient(135deg,rgba(255,255,255,.08),rgba(16,12,42,.22))) !important;
+      backdrop-filter: var(--ha-lg-filter) !important;
+      -webkit-backdrop-filter: var(--ha-lg-filter) !important;
+      box-shadow: var(--liquid-glass-shadow,inset 0 1px 0 rgba(255,255,255,.48),inset 1px 0 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(180,165,240,.22),0 12px 30px rgba(0,0,0,.24)) !important;
+    }
+  `;
+  function svg(name, attrs) {
+    const node = document.createElementNS(ns,name);
+    for (const [k,v] of Object.entries(attrs)) node.setAttribute(k,v);
+    return node;
+  }
+  function parent(el) { return el.assignedSlot || el.parentElement || el.getRootNode()?.host || null; }
+  function number(style, name, fallback, min, max) {
+    const n = parseFloat(style.getPropertyValue('--liquid-glass-'+name));
+    return Math.max(min,Math.min(max,Number.isFinite(n)?n:fallback));
+  }
+  function disabled(el) {
+    for(let p=el;p;p=parent(p)) if(p.hasAttribute?.('data-liquid-glass-ignore')) return true;
+    return getComputedStyle(el).getPropertyValue('--liquid-glass-enabled').trim()==='0';
+  }
+  function kind(el) {
+    if(el.matches('ha-card,[data-liquid-glass]')) return 'card';
+    const host=el.getRootNode()?.host;
+    if(el.matches('dialog') && host?.localName==='wa-dialog') return 'dialog';
+    if(el.matches('.mdc-dialog__surface') && ['ha-dialog','mwc-dialog'].includes(host?.localName)) return 'dialog';
+    return null;
+  }
+  function eligible(el) {
+    const type=kind(el);
+    if(!type || disabled(el)) return false;
+    if(mobile && !mobileOverride && getComputedStyle(el).getPropertyValue('--liquid-glass-mobile').trim()!=='1') return false;
+    if(type==='dialog') return getComputedStyle(el).getPropertyValue('--liquid-glass-dialogs').trim()==='1';
+    // Avoid two filters on wrapper cards and their inner cards, across slots/shadow roots.
+    for(let p=parent(el);p;p=parent(p)) if(kind(p)==='card' && !disabled(p)) return false;
+    return true;
+  }
+  function installRoot(root) {
+    if(roots.has(root)) return roots.get(root);
+    const style=document.createElement('style');style.setAttribute(owned,'');style.textContent=css;
+    const container=svg('svg',{[owned]:'',width:0,height:0,'aria-hidden':'true',focusable:'false'});
+    container.style.cssText='position:absolute;width:0;height:0;overflow:hidden;pointer-events:none';
+    const defs=svg('defs',{});container.append(defs);
+    (root===document?document.head:root).append(style);
+    (root===document?document.body:root).append(container);
+    const observer=new MutationObserver(records=>{
+      if(records.some(r=>!r.target.closest?.('['+owned+']') &&
+        [...r.addedNodes,...r.removedNodes].some(n=>n.nodeType===1 && !n.hasAttribute?.(owned)))) scheduleScan();
+    });
+    observer.observe(root,{childList:true,subtree:true});
+    const state={style,container,defs,observer};roots.set(root,state);return state;
+  }
+  const resize=new ResizeObserver(entries=>entries.forEach(({target})=>queue(target)));
+  const intersection=new IntersectionObserver(entries=>entries.forEach(entry=>{
+    const state=panes.get(entry.target);if(!state)return;
+    state.visible=entry.isIntersecting;if(state.visible)queue(entry.target);
+  }),{rootMargin:'120px'});
+  function add(el) {
+    if(panes.has(el)) {queue(el);return;}
+    const root=el.getRootNode();const store=installRoot(root);
+    const id='ha-lg-'+(++serial);
+    const filter=svg('filter',{id,filterUnits:'userSpaceOnUse',primitiveUnits:'userSpaceOnUse',x:0,y:0,'color-interpolation-filters':'sRGB'});
+    const map=svg('feImage',{x:0,y:0,result:'map',preserveAspectRatio:'none'});
+    // Exact neutral 128 -> 0.5; prevents a constant half-pixel shift in flat centres.
+    const neutral=svg('feComponentTransfer',{in:'map',result:'centered'});
+    neutral.append(svg('feFuncR',{type:'linear',slope:1,intercept:-.5/255}),svg('feFuncG',{type:'linear',slope:1,intercept:-.5/255}));
+    const displacement=svg('feDisplacementMap',{in:'SourceGraphic',in2:'centered',scale:72,xChannelSelector:'R',yChannelSelector:'G'});
+    filter.append(map,neutral,displacement);store.defs.append(filter);
+    panes.set(el,{root,filter,map,displacement,key:'',visible:true,
+      oldFilter:el.style.getPropertyValue('--ha-lg-filter'),oldPriority:el.style.getPropertyPriority('--ha-lg-filter')});
+    resize.observe(el);intersection.observe(el);queue(el);
+  }
+  function remove(el) {
+    const state=panes.get(el);if(!state)return;
+    resize.unobserve(el);intersection.unobserve(el);dirty.delete(el);
+    el.removeAttribute(mark);
+    if(state.oldFilter)el.style.setProperty('--ha-lg-filter',state.oldFilter,state.oldPriority);
+    else el.style.removeProperty('--ha-lg-filter');
+    state.filter.remove();panes.delete(el);
+  }
+  // Orthographic rays through a spherical front surface, n_air=1, n_glass=1.5.
+  // u is the radial surface coordinate (0 at the flat shoulder, 1 at the rim).
+  // Snell: theta_t = asin(sin(theta_i)/1.5). Propagating the refracted
+  // ray to a virtual sampling plane gives a lateral shift proportional to
+  // tan(theta_i-theta_t). Normalize only the peak; strength stays compatible.
+  // Unlike the old quartic, this has finite optical power at the centre and
+  // a steep grazing-angle shoulder at the rim. It is a single-interface lens
+  // approximation, NOT a ray-traced glass sphere or Apple's private shader.
+  const lensCurve=Float64Array.from({length:1025},(_,i)=>{
+    const u=i/1024;
+    return Math.tan(Math.asin(u)-Math.asin(u/1.5))/Math.sqrt(1.5*1.5-1);
+  });
+  function lensBend(t) {
+    const index=(1-t)*1024,lo=Math.floor(index),hi=Math.min(1024,lo+1);
+    return lensCurve[lo]+(lensCurve[hi]-lensCurve[lo])*(index-lo);
+  }
+  function update(el) {
+    const state=panes.get(el);if(!state?.visible || !el.isConnected)return;
+    const w=el.offsetWidth,h=el.offsetHeight;if(w<2||h<2)return;
+    const style=getComputedStyle(el);
+    const strength=number(style,'strength',72,0,160);
+    const blur=number(style,'blur',0,0,40);
+    const requestedProfile=style.getPropertyValue('--liquid-glass-profile').trim();
+    const profile=['legacy','convex'].includes(requestedProfile)?requestedProfile:'lens';
+    // Keep opposing rims from crossing on short HA entity cards.
+    const edge=Math.min(number(style,'bevel',48,4,160),Math.min(w,h)/2);
+    const radiusValue=style.borderTopLeftRadius;
+    const radius=Math.min(radiusValue.includes('%')?parseFloat(radiusValue)*Math.min(w,h)/100:parseFloat(radiusValue)||0,w/2,h/2);
+    state.displacement.setAttribute('scale',strength);
+    // Bounded texture size; CSS pixel dimensions remain accurate in the SVG.
+    // Supersample the steep lens rim on small controls; retain the texture cap.
+    const ratio=Math.min(profile==='lens'?2:1,768/Math.max(w,h));
+    const cw=Math.max(2,Math.round(w*ratio)),ch=Math.max(2,Math.round(h*ratio));
+    const key=[w,h,radius,edge,cw,ch,profile].join(':');
+    if(state.key!==key) {
+      const canvas=document.createElement('canvas');canvas.width=cw;canvas.height=ch;
+      const ctx=canvas.getContext('2d');if(!ctx)return;
+      const image=ctx.createImageData(cw,ch);
+      for(let y=0;y<ch;y++)for(let x=0;x<cw;x++) {
+        const px=(x+.5)*w/cw-w/2,py=(y+.5)*h/ch-h/2;
+        const qx=Math.abs(px)-(w/2-radius),qy=Math.abs(py)-(h/2-radius);
+        const ax=Math.max(qx,0),ay=Math.max(qy,0),length=Math.hypot(ax,ay);
+        const d=radius-(length+Math.min(Math.max(qx,qy),0));
+        let nx=0,ny=0;
+        if(length>0){nx=ax/length*Math.sign(px);ny=ay/length*Math.sign(py);}
+        else if(qx>qy)nx=Math.sign(px);else ny=Math.sign(py);
+        const t=Math.max(0,Math.min(1,d/edge));
+        // The inward sampling direction produces magnification. Near the
+        // rim, its steep derivative creates the characteristic folded image.
+        // A circle/capsule becomes a full lens when bevel reaches half-height.
+        // Continue lens normals outside the rounded silhouette: CSS clips the
+        // backdrop, while interpolation at the boundary must not mix in a
+        // neutral map and introduce false ripples around circular buttons.
+        const bend=profile==='lens'?(d<edge?lensBend(t):0):
+          d>=0&&d<edge?(profile==='legacy'?(1-t)**2*(.35+.65*Math.sin(Math.PI*t)):(1-t*t)**2):0;
+        const i=(y*cw+x)*4;
+        image.data[i]=Math.round(128-nx*bend*126);
+        image.data[i+1]=Math.round(128-ny*bend*126);
+        image.data[i+2]=128;image.data[i+3]=255;
+      }
+      ctx.putImageData(image,0,0);
+      state.filter.setAttribute('width',w);state.filter.setAttribute('height',h);
+      state.map.setAttribute('width',w);state.map.setAttribute('height',h);
+      state.map.setAttribute('href',canvas.toDataURL());state.key=key;
+    }
+    // The definition lives in the SAME tree scope as the styled surface.
+    // Blur the backdrop before refraction; foreground text remains untouched.
+    const value=(blur>0?`blur(${blur}px) `: '')+`url("#${state.filter.id}")`;
+    if(el.style.getPropertyValue('--ha-lg-filter')!==value)el.style.setProperty('--ha-lg-filter',value);
+    if(!el.hasAttribute(mark))el.setAttribute(mark,'');
+  }
+  function queue(el) {dirty.add(el);if(!frame&&!stopped)frame=requestAnimationFrame(flush);}
+  function flush() {
+    frame=0;const start=performance.now();
+    for(const el of dirty){dirty.delete(el);try{update(el)}catch(error){remove(el);console.warn('[HA Liquid Glass] Surface skipped',error)}if(performance.now()-start>10)break;}
+    if(dirty.size&&!stopped)frame=requestAnimationFrame(flush);
+  }
+  function scan() {
+    scanTimer=0;if(stopped||document.hidden)return;
+    const found=new Set();
+    function walk(root) {
+      for(const el of root.querySelectorAll('*')) {
+        if(el.closest('['+owned+']'))continue;
+        if(kind(el)&&eligible(el))found.add(el);
+        if(el.shadowRoot)walk(el.shadowRoot);
+      }
+    }
+    walk(document);
+    for(const el of panes.keys())if(!found.has(el)||panes.get(el).root!==el.getRootNode())remove(el);
+    for(const el of found)add(el);
+    for(const [root,state] of roots)if(root!==document&&!root.host.isConnected){state.observer.disconnect();state.style.remove();state.container.remove();roots.delete(root);}
+  }
+  function scheduleScan(){if(!scanTimer&&!stopped)scanTimer=setTimeout(scan,120);}
+  function stop() {
+    stopped=true;clearInterval(timer);clearTimeout(scanTimer);cancelAnimationFrame(frame);
+    document.removeEventListener('visibilitychange',scheduleScan);
+    window.removeEventListener('location-changed',scheduleScan);
+    for(const el of [...panes.keys()])remove(el);
+    for(const state of roots.values()){state.observer.disconnect();state.style.remove();state.container.remove();}
+    roots.clear();resize.disconnect();intersection.disconnect();
+  }
+  window.haLiquidGlass={version:VERSION,refresh:scheduleScan,stop,
+    get status(){return {version:VERSION,supported,mobile,mobileOverride,disabled:off,stopped,surfaces:panes.size,roots:roots.size}}};
+  if(!supported||off){stopped=true;console.info('[HA Liquid Glass] Inactive on this browser or disabled via URL.');return;}
+  function start(){
+    if(stopped)return;
+    installRoot(document);scan();
+    // Discovers late attachShadow()/theme changes without patching browser or HA APIs.
+    timer=setInterval(scan,3000);
+    document.addEventListener('visibilitychange',scheduleScan);
+    window.addEventListener('location-changed',scheduleScan);
+    console.info('[HA Liquid Glass]',VERSION,'Experimental Chromium mode.');
+  }
+  if(document.body)start();else document.addEventListener('DOMContentLoaded',start,{once:true});
+})();
+
+</script>
+<script>
+/* The exact values applied to the live HA module are also exported as YAML. */
+(() => {
+  'use strict';
+  const background='linear-gradient(135deg,rgba(255,255,255,.08),rgba(16,12,42,.22))';
+  const shadow='inset 0 1px 0 rgba(255,255,255,.48),inset 1px 0 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(180,165,240,.22),0 12px 30px rgba(0,0,0,.24)';
+  const fields=[
+    {key:'enabled',label:'Glaseffekt aktiv',type:'check',value:'1'},
+    {key:'mobile',label:'Mobile Browser freischalten',type:'check',value:'0',hint:'Erlaubt den Effekt auch in Chrome auf Android. Rendering und Geschwindigkeit auf deinem Gerät prüfen.'},
+    {key:'strength',label:'Brechungsstärke',min:0,max:160,step:1,value:'72'},
+    {key:'bevel',label:'Kantenbreite · px',min:4,max:160,step:1,value:'48'},
+    {key:'blur',label:'Mattierung · px',min:0,max:40,step:.5,value:'0',hint:'0 = klar. Höhere Werte machen den Hintergrund unscharf; Schrift auf der Karte bleibt scharf.'},
+    {key:'frost',label:'Milchiger Weißanteil · 0–1',min:0,max:1,step:.01,value:'0',hint:'0 = transparent, 1 = vollständig weiß. Für Milchglas z. B. 0.12 bis 0.25.'},
+    {key:'profile',label:'Glasprofil',type:'select',value:'lens',options:[['lens','Glasmurmel · sphärische Linse'],['convex','Gewölbt · Version 0.3'],['legacy','Flach · Version 0.1']],hint:'Glasmurmel: gleichmäßige Vergrößerung innen, starke Umbiegung am Rand. Für vollständig gewölbte Kreise/Kapseln Kantenbreite mindestens auf halbe Höhe stellen.'},
+    {key:'background',label:'Glas-Hintergrund · CSS',type:'css',property:'background',value:background},
+    {key:'shadow',label:'Glaskante & Schatten · CSS',type:'css',property:'box-shadow',value:shadow},
+    {key:'dialogs',label:'Glas auch für Dialoge',type:'check',value:'0',hint:'Vorschau unten rechts; HA-Dialoge können zusätzlich einen eigenen dunklen Hintergrund haben.'}
+  ];
+  const live=document.querySelector('#live'),form=document.querySelector('#settings'),yaml=document.querySelector('#yaml');
+  const state=Object.fromEntries(fields.map(f=>[f.key,f.value]));
+  const controls=new Map();
+  function apply(){
+    for(const [key,value] of Object.entries(state))live.style.setProperty('--liquid-glass-'+key,value);
+    yaml.value=fields.map(f=>'  liquid-glass-'+f.key+': '+JSON.stringify(state[f.key])).join('\n');
+    document.querySelector('.old').style.setProperty('--liquid-glass-mobile',state.mobile);
+    window.haLiquidGlass.refresh();
+    const status=window.haLiquidGlass.status;
+    if(status.mobile&&status.supported)document.querySelector('#status').textContent=(state.mobile==='1'||status.mobileOverride)?'Mobiler Test freigeschaltet · Darstellung und Flüssigkeit bitte auf dem Gerät beurteilen.':'Mobile Sperre aktiv. Zum Testen „Mobile Browser freischalten“ aktivieren.';
+    document.querySelector('#copy-status').textContent='';
+  }
+  for(const f of fields){
+    const wrap=document.createElement('div');wrap.className='field';
+    const label=document.createElement('label');label.htmlFor=f.key;label.textContent=f.label;wrap.append(label);
+    const code=document.createElement('code');code.textContent='liquid-glass-'+f.key;wrap.append(code);
+    let input,range;
+    const error=document.createElement('div');error.className='error';error.id=f.key+'-error';error.setAttribute('aria-live','polite');
+    if(f.type==='check'){input=document.createElement('input');input.type='checkbox';input.checked=f.value==='1';label.append(input)}
+    else if(f.type==='select'){input=document.createElement('select');for(const [value,text] of f.options)input.add(new Option(text,value));wrap.append(input)}
+    else if(f.type==='css'){input=document.createElement('textarea');input.spellcheck=false;input.setAttribute('aria-describedby',error.id);wrap.append(input)}
+    else {const row=document.createElement('div');row.className='value';range=document.createElement('input');range.type='range';range.setAttribute('aria-label',f.label+' Schieberegler');input=document.createElement('input');input.type='number';for(const node of [input,range]){node.min=f.min;node.max=f.max;node.step=f.step;node.value=f.value}row.append(range,input);wrap.append(row)}
+    input.id=f.key;if(f.type!=='check')input.value=f.value;
+    function commit(source){
+      let value=f.type==='check'?(input.checked?'1':'0'):source.value;
+      if(f.type==='css'&&(!value.trim()||!CSS.supports(f.property,value))){error.textContent='Ungültiges CSS. Vorschau und YAML behalten den letzten gültigen Wert.';input.setAttribute('aria-invalid','true');return}
+      if(!f.type){if(value.trim()===''||!Number.isFinite(Number(value)))return;value=String(Math.max(f.min,Math.min(f.max,Number(value))));range.value=value;input.value=value}
+      error.textContent='';input.removeAttribute('aria-invalid');state[f.key]=value;apply();
+    }
+    input.addEventListener('input',()=>commit(input));if(range)range.addEventListener('input',()=>commit(range));
+    wrap.append(error);if(f.hint){const hint=document.createElement('p');hint.className='hint';hint.textContent=f.hint;wrap.append(hint)}
+    controls.set(f.key,{input,range,error});form.append(wrap);
+  }
+  customElements.define('wa-dialog',class extends HTMLElement{
+    constructor(){super();this.attachShadow({mode:'open'}).innerHTML='<style>*{box-sizing:border-box}:host{display:block;margin-top:18px;padding:20px;border-radius:18px;background:repeating-linear-gradient(25deg,#374365 0 12px,#9c81ad 12px 15px,#263756 15px 32px)}dialog{position:relative;inset:auto;display:block;width:100%;margin:0;border:1px solid #ffffff40;border-radius:22px;padding:22px;background:#172133;color:#fff;font:14px system-ui}small{display:block;margin-top:8px}</style><dialog open>Dialog-Vorschau<small>Beschriftung bleibt lesbar.</small></dialog>'}
+  });
+  document.querySelectorAll('[data-preset]').forEach(button=>button.onclick=()=>{
+    Object.assign(state,Object.fromEntries(fields.map(f=>[f.key,f.value])));
+    // Keep mobile opt-in when trying materials on an actual phone.
+    state.mobile=controls.get('mobile').input.checked?'1':'0';
+    if(button.dataset.preset==='marble')Object.assign(state,{strength:'72',bevel:'64',blur:'1',frost:'0.08',background:'linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.10))',shadow:'inset 0 1px 1px rgba(255,255,255,.85),inset 1px 0 1px rgba(255,255,255,.3),inset 0 -1px 1px rgba(255,255,255,.65),inset 0 0 0 1px rgba(30,35,55,.12),0 8px 18px rgba(20,20,40,.14)'});
+    if(button.dataset.preset==='milk')Object.assign(state,{blur:'12',frost:'0.18'});
+    if(button.dataset.preset==='thick')Object.assign(state,{strength:'110',bevel:'64'});
+    for(const f of fields){const {input,range,error}=controls.get(f.key);if(f.type==='check')input.checked=state[f.key]==='1';else input.value=state[f.key];if(range)range.value=state[f.key];error.textContent='';input.removeAttribute('aria-invalid')}
+    apply();
+  });
+  document.querySelector('#reference-profile').onchange=e=>{
+    const old=document.querySelector('.old'),legacy=e.target.value==='legacy';
+    old.style.setProperty('--liquid-glass-profile',e.target.value);
+    old.style.setProperty('--liquid-glass-strength',legacy?'22':'72');
+    old.style.setProperty('--liquid-glass-bevel',legacy?'26':'48');
+    document.querySelector('#reference-label').textContent=legacy?'Version 0.1 · 22 / 26 · ohne Mattierung':'Version 0.3 · 72 / 48 · ohne Mattierung';
+    window.haLiquidGlass.refresh();
+  };
+  document.querySelector('#motion').onchange=e=>{
+    document.body.classList.toggle('paused',!e.target.checked);
+    if(e.target.checked){
+      document.querySelectorAll('.reading-sheet').forEach(el=>{el.style.removeProperty('animation');el.style.removeProperty('transform')});
+      document.querySelector('#text-position-value').value='automatisch';
+    }
+  };
+  document.querySelector('#text-position').oninput=e=>{
+    document.querySelector('#motion').checked=false;document.body.classList.add('paused');
+    document.querySelectorAll('.reading-sheet').forEach(el=>{el.style.animation='none';el.style.transform=`translateY(${-Number(e.target.value)}px)`});
+    document.querySelector('#text-position-value').value=e.target.value+' px';
+  };
+  let imageURL;
+  document.querySelector('#scene').onchange=e=>{document.body.classList.remove('custom-image');document.body.classList.toggle('landscape',e.target.value==='landscape')};
+  document.querySelector('#image').onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;
+    const url=URL.createObjectURL(file),img=new Image();img.src=url;
+    try{await img.decode();if(imageURL)URL.revokeObjectURL(imageURL);imageURL=url;document.body.style.setProperty('--preview-image',`url("${url}")`);document.body.classList.add('custom-image');document.querySelector('#status').textContent='Eigenes Bild geladen · nur lokal in diesem Browser.'}
+    catch{URL.revokeObjectURL(url);document.querySelector('#status').textContent='Dieses Bild konnte nicht geladen werden.'}
+  };
+  document.querySelector('#copy').onclick=async()=>{
+    try{await navigator.clipboard.writeText(yaml.value);document.querySelector('#copy-status').textContent='Theme-Werte kopiert.'}
+    catch{yaml.focus();yaml.select();document.querySelector('#copy-status').textContent='YAML markiert. Mit Strg+C (Mac: ⌘C) kopieren.'}
+  };
+  apply();
+  if(!window.haLiquidGlass.status.supported)document.querySelector('#status').textContent='Dieser Browser wird vom Modul nicht unterstützt. Bitte Chrome oder Edge verwenden.';
+})();
+
+</script>
+</body>
+</html>

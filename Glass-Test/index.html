@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="de">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Liquid Glass · Theme-Konfigurator</title>
+<link rel="stylesheet" href="configurator.css">
+<body>
+<main>
+<header><span class="eyebrow">HOME ASSISTANT · LIQUID GLASS 0.4</span><h1>Dein Glas. Deine Einstellungen.</h1><p>Wölbung und Milchglas live einstellen. Die Vorschau verwendet dasselbe Modul wie Home Assistant.</p></header>
+<div class="layout">
+<aside class="editor"><h2>Theme-Einstellungen</h2><div class="presets"><button data-preset="marble">Glasmurmel</button><button data-preset="clear">Klarglas</button><button data-preset="milk">Milchglas</button><button data-preset="thick">Extra dick</button></div><p class="hint">Voreinstellungen setzen die Materialwerte zurück. Die mobile Freischaltung bleibt erhalten.</p><form id="settings" onsubmit="return false"></form></aside>
+<div class="preview">
+<div class="preview-tools"><label><input id="motion" type="checkbox" checked> Hintergrund bewegen</label><label>Hintergrund <select id="scene"><option value="grid">Raster & Farben</option><option value="landscape">Abendlicht</option></select></label><label class="upload">Eigenes Bild <input id="image" type="file" accept="image/*"></label></div>
+<label class="text-position">Textposition <input id="text-position" type="range" min="-40" max="205" value="155"><output id="text-position-value">automatisch</output></label>
+<p class="hint">Textposition hält die Animation an und zeigt beide Linsen über derselben Textstelle. Hintergrundwahl und Bewegung dienen nur der Vorschau. Ein eigenes Bild bleibt lokal.</p>
+<label class="reference-choice">Vergleich mit <select id="reference-profile"><option value="convex">Version 0.3 · gewölbter Rand</option><option value="legacy">Version 0.1 · ursprünglicher Rand</option></select></label>
+<div class="comparison">
+<section class="old"><h2>Bisher <small id="reference-label">Version 0.3 · 72 / 48 · ohne Mattierung</small></h2><div class="lens-scene">
+<div class="reading-sheet" aria-hidden="true"><div class="architecture"></div><h3>Die Architektur</h3><p>Licht fällt durch die großen Fenster. Hinter dem Glas wandern Buchstaben und Linien vorbei.</p><p>Runde Formen, klare Konturen und der Blick ins Grüne.</p><div class="ruler">0123456789 · ABCDE</div></div>
+<div class="lens-controls"><button class="marble" data-liquid-glass aria-label="Glasbutton als optisches Testobjekt">☰</button><div class="search-lens" data-liquid-glass><span aria-hidden="true">⌕</span> Suchen</div></div>
+</div><p class="hint">Runder Button & Suchleiste · danach die HA-Karten</p><div class="scene"><div class="backdrop"></div><div class="pane" data-liquid-glass><strong>Wohnzimmer</strong><span>21,4 °C · 48 % Luftfeuchte</span></div><div class="pane row" data-liquid-glass><strong>Rollo Wohnzimmer</strong><span>↑ &nbsp; ■ &nbsp; ↓</span></div></div></section>
+<section id="live"><h2>Dein Theme <small>Alle Werte aus dem Formular</small></h2><div class="lens-scene">
+<div class="reading-sheet" aria-hidden="true"><div class="architecture"></div><h3>Die Architektur</h3><p>Licht fällt durch die großen Fenster. Hinter dem Glas wandern Buchstaben und Linien vorbei.</p><p>Runde Formen, klare Konturen und der Blick ins Grüne.</p><div class="ruler">0123456789 · ABCDE</div></div>
+<div class="lens-controls"><button class="marble" data-liquid-glass aria-label="Glasbutton als optisches Testobjekt">☰</button><div class="search-lens" data-liquid-glass><span aria-hidden="true">⌕</span> Suchen</div></div>
+</div><p class="hint">Runder Button & Suchleiste · danach die HA-Karten</p><div class="scene"><div class="backdrop"></div><div class="pane" data-liquid-glass><strong>Wohnzimmer</strong><span>21,4 °C · 48 % Luftfeuchte</span></div><div class="pane row" data-liquid-glass><strong>Rollo Wohnzimmer</strong><span>↑ &nbsp; ■ &nbsp; ↓</span></div></div><wa-dialog></wa-dialog></section>
+</div>
+<p class="hint">Die Dialogfläche unten rechts zeigt „liquid-glass-dialogs“. Rundungen und Kartenhöhen kommen wie in HA von der jeweiligen Karte. Andere Hintergründe und Karten können anders wirken.</p>
+<section class="export"><div class="export-header"><h2>Ins bestehende Theme übernehmen</h2><button id="copy">YAML kopieren</button></div><p class="hint">Auf gleicher Ebene wie „ha-card-background“ einfügen. Vorhandene gleichnamige Einträge ersetzen.</p><textarea id="yaml" readonly spellcheck="false" aria-label="Theme YAML"></textarea><p id="copy-status" role="status"></p></section>
+<p id="status" role="status">Desktop Chrome / Edge · HA-Modul 0.4.0 · lokal und ohne HA-Verbindung</p>
+</div>
+</div>
+</main>
+<script src="ha-liquid-glass.js"></script>
+<script src="configurator.js"></script>
+</body>
+</html>

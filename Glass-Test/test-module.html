@@ -1,0 +1,92 @@
+<!doctype html><meta charset="utf-8"><title>Liquid Glass module integration test</title>
+<style>body{background:repeating-linear-gradient(25deg,#234 0 16px,#bac 16px 20px,#345 20px 40px);color:white;font:16px system-ui;padding:30px;min-height:1200px}#report{background:#121522;padding:20px;white-space:pre-wrap;position:relative;z-index:3}ha-card{display:block}test-dashboard{display:block}</style>
+<h1>Shadow DOM · native backdrop test</h1><pre id="report">Tests running…</pre><test-dashboard></test-dashboard>
+<script>
+customElements.define('ha-card',class extends HTMLElement{constructor(){super();this.attachShadow({mode:'open'}).innerHTML='<style>:host{display:block;background:#172133;border-radius:28px;padding:30px;box-sizing:border-box;width:440px;min-height:190px;margin:20px 0}</style><slot></slot>'}});
+customElements.define('test-dashboard',class extends HTMLElement{constructor(){super();this.attachShadow({mode:'open'}).innerHTML='<ha-card id="first">Eine Karte im Shadow DOM<br>Text bleibt scharf.</ha-card><ha-card id="outer">Äußere Karte<ha-card id="inner">Innere Karte ohne zweiten Filter</ha-card></ha-card>'}});
+</script>
+<script type="module" src="ha-liquid-glass.js"></script>
+<script type="module">
+const wait=async ms=>{await new Promise(r=>setTimeout(r,ms));await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame)};
+const lines=[];const report=document.getElementById('report');
+function check(name,condition){lines.push((condition?'PASS ':'FAIL ')+name);report.textContent=lines.join('\n');if(!condition)throw Error(name)}
+try{
+await wait(500);
+const root=document.querySelector('test-dashboard').shadowRoot;
+const first=root.querySelector('#first');
+check('two outer cards detected',haLiquidGlass.status.surfaces===2);
+check('nested card excluded',!root.querySelector('#inner').hasAttribute('data-ha-liquid-glass'));
+check('SVG lives in target tree scope',!!root.querySelector('svg filter'));
+check('backdrop URL applied',getComputedStyle(first).backdropFilter.includes('ha-lg-'));
+first.style.width='520px';await wait(350);
+const filter=root.querySelector('filter');
+check('resize updates dimensions (actual '+filter.getAttribute('width')+')',filter.getAttribute('width')==='520');
+const newCard=document.createElement('ha-card');newCard.textContent='Dynamisch hinzugefügt';root.append(newCard);
+await wait(450);check('dynamic card detected',haLiquidGlass.status.surfaces===3);
+newCard.remove();await wait(450);check('removed card cleaned',haLiquidGlass.status.surfaces===2);
+first.style.setProperty('--liquid-glass-enabled','0');haLiquidGlass.refresh();await wait(450);
+check('per-card opt-out restored original background',!first.hasAttribute('data-ha-liquid-glass')&&getComputedStyle(first).backgroundColor==='rgb(23, 33, 51)');
+first.style.removeProperty('--liquid-glass-enabled');haLiquidGlass.refresh();await wait(450);
+check('re-enable works',first.hasAttribute('data-ha-liquid-glass'));
+// Verify real generated displacement, including centre neutrality and theme updates.
+const activeFilter=root.getElementById(first.style.getPropertyValue('--ha-lg-filter').match(/#([^"]+)/)[1]);
+const displacement=activeFilter.querySelector('feDisplacementMap');
+check('stronger default applied',displacement.getAttribute('scale')==='72');
+const map=activeFilter.querySelector('feImage');
+const img=new Image();img.src=map.getAttribute('href');await img.decode();
+const canvas=document.createElement('canvas');canvas.width=img.width;canvas.height=img.height;
+const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);
+const centre=ctx.getImageData(Math.floor(img.width/2),Math.floor(img.height/2),1,1).data;
+check('flat centre remains neutral',centre[0]===128&&centre[1]===128);
+const rim=ctx.getImageData(1,Math.floor(img.height/2),1,1).data;
+check('lens rim still has strong displacement',(rim[0]-128)/255*72>20);
+first.style.setProperty('--liquid-glass-strength','0');haLiquidGlass.refresh();await wait(450);
+check('zero strength disables displacement',displacement.getAttribute('scale')==='0');
+first.style.setProperty('--liquid-glass-strength','110');haLiquidGlass.refresh();await wait(450);
+check('extra thick strength is no longer capped at 60',displacement.getAttribute('scale')==='110');
+const curved=map.getAttribute('href');
+first.style.setProperty('--liquid-glass-profile','legacy');haLiquidGlass.refresh();await wait(450);
+check('profile change regenerates map',map.getAttribute('href')!==curved);
+first.style.removeProperty('--liquid-glass-profile');first.style.removeProperty('--liquid-glass-strength');
+haLiquidGlass.refresh();await wait(450);
+const unchangedMap=map.getAttribute('href');
+first.style.setProperty('--liquid-glass-blur','12');first.style.setProperty('--liquid-glass-frost','0.18');haLiquidGlass.refresh();await wait(450);
+check('frosted backdrop uses blur before refraction',getComputedStyle(first).backdropFilter.startsWith('blur(12px) url('));
+check('milky overlay is applied',getComputedStyle(first).backgroundImage.includes('0.18'));
+check('foreground is not filtered',getComputedStyle(first).filter==='none');
+check('blur does not regenerate displacement texture',map.getAttribute('href')===unchangedMap);
+first.style.setProperty('--liquid-glass-blur','100');haLiquidGlass.refresh();await wait(450);
+check('blur is bounded to 40px',getComputedStyle(first).backdropFilter.startsWith('blur(40px)'));
+first.style.setProperty('--liquid-glass-blur','0');first.style.setProperty('--liquid-glass-frost','0');haLiquidGlass.refresh();await wait(450);
+check('zero blur returns to clear glass',!getComputedStyle(first).backdropFilter.includes('blur('));
+// Circle and capsule: same cross-section, smooth centre and folded outer rim.
+const circle=document.createElement('div');circle.setAttribute('data-liquid-glass','');
+circle.style.cssText='position:fixed;left:10px;top:10px;width:80px;height:80px;border-radius:50%;--liquid-glass-bevel:40';
+const capsule=document.createElement('div');capsule.setAttribute('data-liquid-glass','');
+capsule.style.cssText='position:fixed;left:110px;top:10px;width:240px;height:80px;border-radius:999px;--liquid-glass-bevel:40';
+root.append(circle,capsule);haLiquidGlass.refresh();await wait(450);
+async function pixels(el){
+  const f=root.getElementById(el.style.getPropertyValue('--ha-lg-filter').match(/#([^"]+)/)[1]);
+  const im=new Image();im.src=f.querySelector('feImage').getAttribute('href');await im.decode();
+  const c=document.createElement('canvas');c.width=im.width;c.height=im.height;
+  const context=c.getContext('2d');context.drawImage(im,0,0);const data=context.getImageData(0,0,c.width,c.height);data.cssWidth=el.offsetWidth;data.cssHeight=el.offsetHeight;return data;
+}
+const sphere=await pixels(circle),pill=await pixels(capsule);
+const channel=(data,x,y,c)=>data.data[(Math.floor((y+.5)*data.height/data.cssHeight)*data.width+Math.floor((x+.5)*data.width/data.cssWidth))*4+c];
+check('sphere is radially symmetric',Math.abs(channel(sphere,59,39,0)-channel(sphere,39,59,1))<=1);
+check('opposing sphere sides are balanced',Math.abs(channel(sphere,59,39,0)+channel(sphere,20,39,0)-256)<=1);
+check('sphere and capsule share cylindrical cross-section',channel(sphere,39,10,1)===channel(pill,119,10,1));
+const sampleX=x=>x+(channel(sphere,x,39,0)-128)*72/255;
+check('centre magnifies without flipping',sampleX(45)>sampleX(40)&&sampleX(45)-sampleX(40)<5);
+check('fold is confined near the outer rim',sampleX(79)<sampleX(77)&&sampleX(60)>sampleX(55));
+circle.style.setProperty('--liquid-glass-profile','convex');haLiquidGlass.refresh();await wait(450);
+const oldSphere=await pixels(circle);
+check('old convex profile remains selectable',channel(oldSphere,59,39,0)!==channel(sphere,59,39,0));
+circle.remove();capsule.remove();haLiquidGlass.refresh();await wait(450);
+const saved=haLiquidGlass;const dupe=document.createElement('script');dupe.src='ha-liquid-glass.js?duplicate';document.head.append(dupe);await wait(350);
+check('duplicate load is idempotent',haLiquidGlass===saved&&haLiquidGlass.status.surfaces===2);
+haLiquidGlass.stop();
+check('stop removes styles, attributes and SVG',!document.querySelector('[data-ha-lg-owned]')&&!root.querySelector('[data-ha-lg-owned]')&&!root.querySelector('[data-ha-liquid-glass]')&&haLiquidGlass.status.surfaces===0);
+report.textContent+='\nALL TESTS PASSED';
+}catch(error){report.textContent+='\nERROR '+error.stack}
+</script>
