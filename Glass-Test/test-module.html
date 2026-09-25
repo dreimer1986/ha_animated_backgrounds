@@ -5,7 +5,7 @@
 customElements.define('ha-card',class extends HTMLElement{constructor(){super();this.attachShadow({mode:'open'}).innerHTML='<style>:host{display:block;background:#172133;border-radius:28px;padding:30px;box-sizing:border-box;width:440px;min-height:190px;margin:20px 0}</style><slot></slot>'}});
 customElements.define('test-dashboard',class extends HTMLElement{constructor(){super();this.attachShadow({mode:'open'}).innerHTML='<ha-card id="first">Eine Karte im Shadow DOM<br>Text bleibt scharf.</ha-card><ha-card id="outer">Äußere Karte<ha-card id="inner">Innere Karte ohne zweiten Filter</ha-card></ha-card>'}});
 </script>
-<script type="module" src="ha-liquid-glass.js"></script>
+<script type="module" src="../www/ha-liquid-glass.js"></script>
 <script type="module">
 const wait=async ms=>{await new Promise(r=>setTimeout(r,ms));await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame);await new Promise(requestAnimationFrame)};
 const lines=[];const report=document.getElementById('report');
@@ -83,7 +83,7 @@ circle.style.setProperty('--liquid-glass-profile','convex');haLiquidGlass.refres
 const oldSphere=await pixels(circle);
 check('old convex profile remains selectable',channel(oldSphere,59,39,0)!==channel(sphere,59,39,0));
 circle.remove();capsule.remove();haLiquidGlass.refresh();await wait(450);
-const saved=haLiquidGlass;const dupe=document.createElement('script');dupe.src='ha-liquid-glass.js?duplicate';document.head.append(dupe);await wait(350);
+const saved=haLiquidGlass;const dupe=document.createElement('script');dupe.src='../www/ha-liquid-glass.js?duplicate';document.head.append(dupe);await wait(350);
 check('duplicate load is idempotent',haLiquidGlass===saved&&haLiquidGlass.status.surfaces===2);
 haLiquidGlass.stop();
 check('stop removes styles, attributes and SVG',!document.querySelector('[data-ha-lg-owned]')&&!root.querySelector('[data-ha-lg-owned]')&&!root.querySelector('[data-ha-liquid-glass]')&&haLiquidGlass.status.surfaces===0);

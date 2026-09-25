@@ -15,3 +15,5 @@
 @media(max-width:720px){.lens-controls{left:14px;right:14px;gap:10px}.search-lens{padding:0 14px;font-size:22px}.reading-sheet{padding-inline:18px}.reading-sheet p{font-size:22px}}
 
 .text-position{display:flex;align-items:center;gap:12px;margin-top:16px;font-size:12px}.text-position input{width:min(240px,45vw)}.text-position output{min-width:80px;color:#bcbdd3}
+
+.sidebar-heading{margin-top:24px}.sidebar-scene{padding:16px;border-radius:24px;background:repeating-linear-gradient(25deg,transparent 0 35px,#ffffff44 36px 38px,transparent 39px 75px),radial-gradient(ellipse at 70% 32%,#9984ce,transparent 50%),linear-gradient(150deg,#253d66,#72598e 60%,#15243f)}.old{--liquid-glass-sidebar:0}

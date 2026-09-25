@@ -296,3 +296,9 @@ These are the very same pics shown on my own Modified Theme Repo: https://github
 <p align="center">
   <img src="https://raw.githubusercontent.com/dreimer1986/yourname_uix/refs/heads/master/assets/original-mobile.webp" alt="Original - Mobile version" width="50%">
 </p>
+
+## Liquid Glass and UIX sidebar
+
+The optional frontend module is in [`www/ha-liquid-glass.js`](www/ha-liquid-glass.js). Version 0.5 adds individual glass sidebar buttons, coordinated with the updated Your Name UIX themes. Install it as `/local/ha-liquid-glass.js?v=0.5.0`; use `frontend.extra_module_url` for loading on all HA pages. The animated-background script is unchanged. See [installation and theme settings](Glass-Test/INSTALL.md) and the [offline configurator](Glass-Test/Glass-Vergleich.html).
+
+The user confirmed the version 0.4 glass effect works in Chrome on Android and the official Home Assistant app. The new sidebar integration has been checked locally and still needs validation on the actual device.

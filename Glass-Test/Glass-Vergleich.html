@@ -22,42 +22,45 @@
 
 .text-position{display:flex;align-items:center;gap:12px;margin-top:16px;font-size:12px}.text-position input{width:min(240px,45vw)}.text-position output{min-width:80px;color:#bcbdd3}
 
+.sidebar-heading{margin-top:24px}.sidebar-scene{padding:16px;border-radius:24px;background:repeating-linear-gradient(25deg,transparent 0 35px,#ffffff44 36px 38px,transparent 39px 75px),radial-gradient(ellipse at 70% 32%,#9984ce,transparent 50%),linear-gradient(150deg,#253d66,#72598e 60%,#15243f)}.old{--liquid-glass-sidebar:0}
+
 </style>
 <body>
 <main>
-<header><span class="eyebrow">HOME ASSISTANT · LIQUID GLASS 0.4</span><h1>Dein Glas. Deine Einstellungen.</h1><p>Wölbung und Milchglas live einstellen. Die Vorschau verwendet dasselbe Modul wie Home Assistant.</p></header>
+<header><span class="eyebrow">HOME ASSISTANT · LIQUID GLASS 0.5</span><h1>Dein Glas. Deine Einstellungen.</h1><p>Wölbung und Milchglas live einstellen. Die Vorschau verwendet dasselbe Modul wie Home Assistant.</p></header>
 <div class="layout">
 <aside class="editor"><h2>Theme-Einstellungen</h2><div class="presets"><button data-preset="marble">Glasmurmel</button><button data-preset="clear">Klarglas</button><button data-preset="milk">Milchglas</button><button data-preset="thick">Extra dick</button></div><p class="hint">Voreinstellungen setzen die Materialwerte zurück. Die mobile Freischaltung bleibt erhalten.</p><form id="settings" onsubmit="return false"></form></aside>
 <div class="preview">
 <div class="preview-tools"><label><input id="motion" type="checkbox" checked> Hintergrund bewegen</label><label>Hintergrund <select id="scene"><option value="grid">Raster & Farben</option><option value="landscape">Abendlicht</option></select></label><label class="upload">Eigenes Bild <input id="image" type="file" accept="image/*"></label></div>
 <label class="text-position">Textposition <input id="text-position" type="range" min="-40" max="205" value="155"><output id="text-position-value">automatisch</output></label>
 <p class="hint">Textposition hält die Animation an und zeigt beide Linsen über derselben Textstelle. Hintergrundwahl und Bewegung dienen nur der Vorschau. Ein eigenes Bild bleibt lokal.</p>
+<label class="preview-tools"><input id="sidebar-collapsed" type="checkbox"> Sidebar als schmale Symbolleiste testen</label>
 <label class="reference-choice">Vergleich mit <select id="reference-profile"><option value="convex">Version 0.3 · gewölbter Rand</option><option value="legacy">Version 0.1 · ursprünglicher Rand</option></select></label>
 <div class="comparison">
 <section class="old"><h2>Bisher <small id="reference-label">Version 0.3 · 72 / 48 · ohne Mattierung</small></h2><div class="lens-scene">
 <div class="reading-sheet" aria-hidden="true"><div class="architecture"></div><h3>Die Architektur</h3><p>Licht fällt durch die großen Fenster. Hinter dem Glas wandern Buchstaben und Linien vorbei.</p><p>Runde Formen, klare Konturen und der Blick ins Grüne.</p><div class="ruler">0123456789 · ABCDE</div></div>
 <div class="lens-controls"><button class="marble" data-liquid-glass aria-label="Glasbutton als optisches Testobjekt">☰</button><div class="search-lens" data-liquid-glass><span aria-hidden="true">⌕</span> Suchen</div></div>
-</div><p class="hint">Runder Button & Suchleiste · danach die HA-Karten</p><div class="scene"><div class="backdrop"></div><div class="pane" data-liquid-glass><strong>Wohnzimmer</strong><span>21,4 °C · 48 % Luftfeuchte</span></div><div class="pane row" data-liquid-glass><strong>Rollo Wohnzimmer</strong><span>↑ &nbsp; ■ &nbsp; ↓</span></div></div></section>
+</div><p class="hint">Runder Button & Suchleiste · danach die HA-Karten</p><div class="scene"><div class="backdrop"></div><div class="pane" data-liquid-glass><strong>Wohnzimmer</strong><span>21,4 °C · 48 % Luftfeuchte</span></div><div class="pane row" data-liquid-glass><strong>Rollo Wohnzimmer</strong><span>↑ &nbsp; ■ &nbsp; ↓</span></div></div><h2 class="sidebar-heading">Sidebar</h2><div class="sidebar-scene"><ha-sidebar></ha-sidebar></div></section>
 <section id="live"><h2>Dein Theme <small>Alle Werte aus dem Formular</small></h2><div class="lens-scene">
 <div class="reading-sheet" aria-hidden="true"><div class="architecture"></div><h3>Die Architektur</h3><p>Licht fällt durch die großen Fenster. Hinter dem Glas wandern Buchstaben und Linien vorbei.</p><p>Runde Formen, klare Konturen und der Blick ins Grüne.</p><div class="ruler">0123456789 · ABCDE</div></div>
 <div class="lens-controls"><button class="marble" data-liquid-glass aria-label="Glasbutton als optisches Testobjekt">☰</button><div class="search-lens" data-liquid-glass><span aria-hidden="true">⌕</span> Suchen</div></div>
-</div><p class="hint">Runder Button & Suchleiste · danach die HA-Karten</p><div class="scene"><div class="backdrop"></div><div class="pane" data-liquid-glass><strong>Wohnzimmer</strong><span>21,4 °C · 48 % Luftfeuchte</span></div><div class="pane row" data-liquid-glass><strong>Rollo Wohnzimmer</strong><span>↑ &nbsp; ■ &nbsp; ↓</span></div></div><wa-dialog></wa-dialog></section>
+</div><p class="hint">Runder Button & Suchleiste · danach die HA-Karten</p><div class="scene"><div class="backdrop"></div><div class="pane" data-liquid-glass><strong>Wohnzimmer</strong><span>21,4 °C · 48 % Luftfeuchte</span></div><div class="pane row" data-liquid-glass><strong>Rollo Wohnzimmer</strong><span>↑ &nbsp; ■ &nbsp; ↓</span></div></div><h2 class="sidebar-heading">Sidebar</h2><div class="sidebar-scene"><ha-sidebar></ha-sidebar></div><wa-dialog></wa-dialog></section>
 </div>
 <p class="hint">Die Dialogfläche unten rechts zeigt „liquid-glass-dialogs“. Rundungen und Kartenhöhen kommen wie in HA von der jeweiligen Karte. Andere Hintergründe und Karten können anders wirken.</p>
 <section class="export"><div class="export-header"><h2>Ins bestehende Theme übernehmen</h2><button id="copy">YAML kopieren</button></div><p class="hint">Auf gleicher Ebene wie „ha-card-background“ einfügen. Vorhandene gleichnamige Einträge ersetzen.</p><textarea id="yaml" readonly spellcheck="false" aria-label="Theme YAML"></textarea><p id="copy-status" role="status"></p></section>
-<p id="status" role="status">Desktop Chrome / Edge · HA-Modul 0.4.0 · lokal und ohne HA-Verbindung</p>
+<p id="status" role="status">Desktop Chrome / Edge · HA-Modul 0.5.0 · lokal und ohne HA-Verbindung</p>
 </div>
 </div>
 </main>
 <script>
-/** HA Liquid Glass 0.4.0 — experimental desktop Chromium frontend module.
+/** HA Liquid Glass 0.5.0 — experimental Chromium frontend module.
  * No network requests, dependencies, credentials or HA service calls.
  * Configure with inherited --liquid-glass-* CSS variables (see INSTALL.md).
  */
 (() => {
   'use strict';
   if (window.haLiquidGlass) return;
-  const VERSION = '0.4.0';
+  const VERSION = '0.5.0';
   const ns = 'http://www.w3.org/2000/svg';
   const mark = 'data-ha-liquid-glass';
   const owned = 'data-ha-lg-owned';
@@ -75,6 +78,24 @@
       -webkit-backdrop-filter: var(--ha-lg-filter) !important;
       box-shadow: var(--liquid-glass-shadow,inset 0 1px 0 rgba(255,255,255,.48),inset 1px 0 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(180,165,240,.22),0 12px 30px rgba(0,0,0,.24)) !important;
     }
+    [${mark}="sidebar"] {
+      border-radius: var(--liquid-glass-sidebar-radius, 22px) !important;
+      background: linear-gradient(rgb(255 255 255 / clamp(0, var(--liquid-glass-frost, 0), 1)),rgb(255 255 255 / clamp(0, var(--liquid-glass-frost, 0), 1))), var(--liquid-glass-sidebar-background, linear-gradient(135deg,rgba(255,255,255,.14),rgba(16,12,42,.16))) !important;
+      box-shadow: var(--liquid-glass-sidebar-shadow,inset 0 1px 0 rgba(255,255,255,.6),inset 1px 0 0 rgba(255,255,255,.18),inset 0 -1px 0 rgba(190,185,255,.28),0 3px 8px rgba(0,0,0,.18)) !important;
+    }
+    [${mark}="sidebar"]::before,
+    [${mark}="sidebar"]::part(base) { border-radius: inherit !important; }
+    [${mark}="sidebar"].selected,
+    [${mark}="sidebar"][aria-selected="true"],
+    [${mark}="sidebar"][aria-current="page"] {
+      outline: 1px solid var(--sidebar-selected-icon-color, var(--primary-color, #c8b6ff));
+      outline-offset: -1px;
+    }
+    [${mark}="sidebar"]:focus-within,
+    [${mark}="sidebar"]:focus-visible {
+      outline: 2px solid var(--primary-text-color, white);
+      outline-offset: -2px;
+    }
   `;
   function svg(name, attrs) {
     const node = document.createElementNS(ns,name);
@@ -90,7 +111,13 @@
     for(let p=el;p;p=parent(p)) if(p.hasAttribute?.('data-liquid-glass-ignore')) return true;
     return getComputedStyle(el).getPropertyValue('--liquid-glass-enabled').trim()==='0';
   }
+  function isSidebarItem(el) {
+    if(!el.matches('ha-list-item-button,ha-md-list-item,paper-icon-item[role="option"],paper-icon-item[aria-role="option"],.menu ha-icon-button')) return false;
+    for(let p=parent(el);p;p=parent(p)) if(p.localName==='ha-sidebar') return true;
+    return false;
+  }
   function kind(el) {
+    if(isSidebarItem(el)) return 'sidebar';
     if(el.matches('ha-card,[data-liquid-glass]')) return 'card';
     const host=el.getRootNode()?.host;
     if(el.matches('dialog') && host?.localName==='wa-dialog') return 'dialog';
@@ -101,6 +128,7 @@
     const type=kind(el);
     if(!type || disabled(el)) return false;
     if(mobile && !mobileOverride && getComputedStyle(el).getPropertyValue('--liquid-glass-mobile').trim()!=='1') return false;
+    if(type==='sidebar') return getComputedStyle(el).getPropertyValue('--liquid-glass-sidebar').trim()==='1';
     if(type==='dialog') return getComputedStyle(el).getPropertyValue('--liquid-glass-dialogs').trim()==='1';
     // Avoid two filters on wrapper cards and their inner cards, across slots/shadow roots.
     for(let p=parent(el);p;p=parent(p)) if(kind(p)==='card' && !disabled(p)) return false;
@@ -168,13 +196,18 @@
   function update(el) {
     const state=panes.get(el);if(!state?.visible || !el.isConnected)return;
     const w=el.offsetWidth,h=el.offsetHeight;if(w<2||h<2)return;
+    const sidebar=kind(el)==='sidebar';
+    // Apply the radius before measuring it, so the optical map matches the
+    // visible pill on the first frame. The selector also wins over UIX fills.
+    const marker=sidebar?'sidebar':'';
+    if(el.getAttribute(mark)!==marker)el.setAttribute(mark,marker);
     const style=getComputedStyle(el);
-    const strength=number(style,'strength',72,0,160);
-    const blur=number(style,'blur',0,0,40);
+    const strength=sidebar?number(style,'sidebar-strength',54,0,160):number(style,'strength',72,0,160);
+    const blur=sidebar?number(style,'sidebar-blur',1.5,0,40):number(style,'blur',0,0,40);
     const requestedProfile=style.getPropertyValue('--liquid-glass-profile').trim();
     const profile=['legacy','convex'].includes(requestedProfile)?requestedProfile:'lens';
     // Keep opposing rims from crossing on short HA entity cards.
-    const edge=Math.min(number(style,'bevel',48,4,160),Math.min(w,h)/2);
+    const edge=Math.min(number(style,sidebar?'sidebar-bevel':'bevel',sidebar?24:48,4,160),Math.min(w,h)/2);
     const radiusValue=style.borderTopLeftRadius;
     const radius=Math.min(radiusValue.includes('%')?parseFloat(radiusValue)*Math.min(w,h)/100:parseFloat(radiusValue)||0,w/2,h/2);
     state.displacement.setAttribute('scale',strength);
@@ -267,6 +300,27 @@
 
 </script>
 <script>
+/* Local structural fixture, not a running HA frontend. Native links keep keyboard behavior. */
+customElements.define('ha-list-item-button',class extends HTMLElement{
+  constructor(){super();this.attachShadow({mode:'open'}).innerHTML='<style>:host{display:block}a{display:flex;align-items:center;gap:14px;box-sizing:border-box;width:100%;height:44px;padding:0 14px;color:inherit;text-decoration:none;background:transparent;border-radius:inherit;white-space:nowrap}a:hover{background:#ffffff12}a:focus-visible{outline:2px solid white;outline-offset:-3px}::slotted(.icon){width:24px;text-align:center;flex-shrink:0}</style><a part="base" href="#sidebar-preview"><slot></slot></a>'}
+});
+customElements.define('ha-sidebar',class extends HTMLElement{
+  constructor(){super();const root=this.attachShadow({mode:'open'});root.innerHTML=`<style>
+  :host{display:flex;flex-direction:column;width:256px;max-width:100%;color:#eee8ff;font:14px system-ui;--sidebar-selected-icon-color:#d2baff;--primary-text-color:#fff;--sidebar-background-color:transparent}
+  .menu{display:flex;align-items:center;gap:14px;height:52px;padding:0 12px}.title{white-space:nowrap}nav{display:block;padding:4px 0}ha-list-item-button{position:relative;margin:0 4px 6px;border-radius:4px;background:#17162e88}ha-list-item-button.selected::before{content:'';position:absolute;inset:0;border-radius:4px;background:#bd98ff;opacity:.16;pointer-events:none}.selected{color:#e6d7ff}.after-spacer{margin-top:18px}.badge{margin-left:auto;padding:2px 6px;border-radius:10px;background:#e8933a;color:#171426;font-size:11px}:host([collapsed]){width:56px}:host([collapsed]) .label,:host([collapsed]) .title,:host([collapsed]) .badge{display:none}
+  </style><div class="menu"><span>☰</span><span class="title">Home Assistant</span></div><nav></nav>`;
+  const nav=root.querySelector('nav');
+  for(const [icon,label,badge] of [['⌂','Übersicht',''],['◇','Karte',''],['ϟ','Energie',''],['▦','Kalender',''],['♫','Medien',''],['⚙','Einstellungen','4'],['◉','Benachrichtigungen',''],['●','Profil','']]){
+    const item=document.createElement('ha-list-item-button');item.innerHTML=`<span class="icon">${icon}</span><span class="label">${label}</span>${badge?`<span class="badge">${badge}</span>`:''}`;
+    if(label==='Übersicht')item.classList.add('selected');
+    if(label==='Einstellungen')item.classList.add('after-spacer');
+    item.addEventListener('click',event=>{event.preventDefault();nav.querySelectorAll('.selected').forEach(el=>el.classList.remove('selected'));item.classList.add('selected')});nav.append(item);
+  }
+  }
+});
+
+</script>
+<script>
 /* The exact values applied to the live HA module are also exported as YAML. */
 (() => {
   'use strict';
@@ -282,6 +336,13 @@
     {key:'profile',label:'Glasprofil',type:'select',value:'lens',options:[['lens','Glasmurmel · sphärische Linse'],['convex','Gewölbt · Version 0.3'],['legacy','Flach · Version 0.1']],hint:'Glasmurmel: gleichmäßige Vergrößerung innen, starke Umbiegung am Rand. Für vollständig gewölbte Kreise/Kapseln Kantenbreite mindestens auf halbe Höhe stellen.'},
     {key:'background',label:'Glas-Hintergrund · CSS',type:'css',property:'background',value:background},
     {key:'shadow',label:'Glaskante & Schatten · CSS',type:'css',property:'box-shadow',value:shadow},
+    {key:'sidebar',label:'Sidebar als Glasflächen',type:'check',value:'1',hint:'Einzelne Navigationseinträge statt einer zusätzlichen Glasplatte vor dem Hintergrund.'},
+    {key:'sidebar-strength',label:'Sidebar · Brechungsstärke',min:0,max:160,step:1,value:'54'},
+    {key:'sidebar-bevel',label:'Sidebar · Kantenbreite · px',min:4,max:160,step:1,value:'24'},
+    {key:'sidebar-blur',label:'Sidebar · Mattierung · px',min:0,max:40,step:.5,value:'1.5'},
+    {key:'sidebar-radius',label:'Sidebar · Rundung · CSS',type:'css',property:'border-top-left-radius',value:'22px'},
+    {key:'sidebar-background',label:'Sidebar · Hintergrund · CSS',type:'css',property:'background',value:'linear-gradient(135deg,rgba(255,255,255,.14),rgba(16,12,42,.16))'},
+    {key:'sidebar-shadow',label:'Sidebar · Lichtkante & Schatten · CSS',type:'css',property:'box-shadow',value:'inset 0 1px 0 rgba(255,255,255,.6),inset 1px 0 0 rgba(255,255,255,.18),inset 0 -1px 0 rgba(190,185,255,.28),0 3px 8px rgba(0,0,0,.18)'},
     {key:'dialogs',label:'Glas auch für Dialoge',type:'check',value:'0',hint:'Vorschau unten rechts; HA-Dialoge können zusätzlich einen eigenen dunklen Hintergrund haben.'}
   ];
   const live=document.querySelector('#live'),form=document.querySelector('#settings'),yaml=document.querySelector('#yaml');
@@ -330,6 +391,7 @@
     for(const f of fields){const {input,range,error}=controls.get(f.key);if(f.type==='check')input.checked=state[f.key]==='1';else input.value=state[f.key];if(range)range.value=state[f.key];error.textContent='';input.removeAttribute('aria-invalid')}
     apply();
   });
+  document.querySelector('#sidebar-collapsed').onchange=e=>document.querySelectorAll('ha-sidebar').forEach(el=>el.toggleAttribute('collapsed',e.target.checked));
   document.querySelector('#reference-profile').onchange=e=>{
     const old=document.querySelector('.old'),legacy=e.target.value==='legacy';
     old.style.setProperty('--liquid-glass-profile',e.target.value);

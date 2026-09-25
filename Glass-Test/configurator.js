@@ -13,6 +13,13 @@
     {key:'profile',label:'Glasprofil',type:'select',value:'lens',options:[['lens','Glasmurmel · sphärische Linse'],['convex','Gewölbt · Version 0.3'],['legacy','Flach · Version 0.1']],hint:'Glasmurmel: gleichmäßige Vergrößerung innen, starke Umbiegung am Rand. Für vollständig gewölbte Kreise/Kapseln Kantenbreite mindestens auf halbe Höhe stellen.'},
     {key:'background',label:'Glas-Hintergrund · CSS',type:'css',property:'background',value:background},
     {key:'shadow',label:'Glaskante & Schatten · CSS',type:'css',property:'box-shadow',value:shadow},
+    {key:'sidebar',label:'Sidebar als Glasflächen',type:'check',value:'1',hint:'Einzelne Navigationseinträge statt einer zusätzlichen Glasplatte vor dem Hintergrund.'},
+    {key:'sidebar-strength',label:'Sidebar · Brechungsstärke',min:0,max:160,step:1,value:'54'},
+    {key:'sidebar-bevel',label:'Sidebar · Kantenbreite · px',min:4,max:160,step:1,value:'24'},
+    {key:'sidebar-blur',label:'Sidebar · Mattierung · px',min:0,max:40,step:.5,value:'1.5'},
+    {key:'sidebar-radius',label:'Sidebar · Rundung · CSS',type:'css',property:'border-top-left-radius',value:'22px'},
+    {key:'sidebar-background',label:'Sidebar · Hintergrund · CSS',type:'css',property:'background',value:'linear-gradient(135deg,rgba(255,255,255,.14),rgba(16,12,42,.16))'},
+    {key:'sidebar-shadow',label:'Sidebar · Lichtkante & Schatten · CSS',type:'css',property:'box-shadow',value:'inset 0 1px 0 rgba(255,255,255,.6),inset 1px 0 0 rgba(255,255,255,.18),inset 0 -1px 0 rgba(190,185,255,.28),0 3px 8px rgba(0,0,0,.18)'},
     {key:'dialogs',label:'Glas auch für Dialoge',type:'check',value:'0',hint:'Vorschau unten rechts; HA-Dialoge können zusätzlich einen eigenen dunklen Hintergrund haben.'}
   ];
   const live=document.querySelector('#live'),form=document.querySelector('#settings'),yaml=document.querySelector('#yaml');
@@ -61,6 +68,7 @@
     for(const f of fields){const {input,range,error}=controls.get(f.key);if(f.type==='check')input.checked=state[f.key]==='1';else input.value=state[f.key];if(range)range.value=state[f.key];error.textContent='';input.removeAttribute('aria-invalid')}
     apply();
   });
+  document.querySelector('#sidebar-collapsed').onchange=e=>document.querySelectorAll('ha-sidebar').forEach(el=>el.toggleAttribute('collapsed',e.target.checked));
   document.querySelector('#reference-profile').onchange=e=>{
     const old=document.querySelector('.old'),legacy=e.target.value==='legacy';
     old.style.setProperty('--liquid-glass-profile',e.target.value);

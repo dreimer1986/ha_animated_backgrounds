@@ -1,11 +1,11 @@
-/** HA Liquid Glass 0.4.0 — experimental desktop Chromium frontend module.
+/** HA Liquid Glass 0.5.0 — experimental Chromium frontend module.
  * No network requests, dependencies, credentials or HA service calls.
  * Configure with inherited --liquid-glass-* CSS variables (see INSTALL.md).
  */
 (() => {
   'use strict';
   if (window.haLiquidGlass) return;
-  const VERSION = '0.4.0';
+  const VERSION = '0.5.0';
   const ns = 'http://www.w3.org/2000/svg';
   const mark = 'data-ha-liquid-glass';
   const owned = 'data-ha-lg-owned';
@@ -23,6 +23,24 @@
       -webkit-backdrop-filter: var(--ha-lg-filter) !important;
       box-shadow: var(--liquid-glass-shadow,inset 0 1px 0 rgba(255,255,255,.48),inset 1px 0 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(180,165,240,.22),0 12px 30px rgba(0,0,0,.24)) !important;
     }
+    [${mark}="sidebar"] {
+      border-radius: var(--liquid-glass-sidebar-radius, 22px) !important;
+      background: linear-gradient(rgb(255 255 255 / clamp(0, var(--liquid-glass-frost, 0), 1)),rgb(255 255 255 / clamp(0, var(--liquid-glass-frost, 0), 1))), var(--liquid-glass-sidebar-background, linear-gradient(135deg,rgba(255,255,255,.14),rgba(16,12,42,.16))) !important;
+      box-shadow: var(--liquid-glass-sidebar-shadow,inset 0 1px 0 rgba(255,255,255,.6),inset 1px 0 0 rgba(255,255,255,.18),inset 0 -1px 0 rgba(190,185,255,.28),0 3px 8px rgba(0,0,0,.18)) !important;
+    }
+    [${mark}="sidebar"]::before,
+    [${mark}="sidebar"]::part(base) { border-radius: inherit !important; }
+    [${mark}="sidebar"].selected,
+    [${mark}="sidebar"][aria-selected="true"],
+    [${mark}="sidebar"][aria-current="page"] {
+      outline: 1px solid var(--sidebar-selected-icon-color, var(--primary-color, #c8b6ff));
+      outline-offset: -1px;
+    }
+    [${mark}="sidebar"]:focus-within,
+    [${mark}="sidebar"]:focus-visible {
+      outline: 2px solid var(--primary-text-color, white);
+      outline-offset: -2px;
+    }
   `;
   function svg(name, attrs) {
     const node = document.createElementNS(ns,name);
@@ -38,7 +56,13 @@
     for(let p=el;p;p=parent(p)) if(p.hasAttribute?.('data-liquid-glass-ignore')) return true;
     return getComputedStyle(el).getPropertyValue('--liquid-glass-enabled').trim()==='0';
   }
+  function isSidebarItem(el) {
+    if(!el.matches('ha-list-item-button,ha-md-list-item,paper-icon-item[role="option"],paper-icon-item[aria-role="option"],.menu ha-icon-button')) return false;
+    for(let p=parent(el);p;p=parent(p)) if(p.localName==='ha-sidebar') return true;
+    return false;
+  }
   function kind(el) {
+    if(isSidebarItem(el)) return 'sidebar';
     if(el.matches('ha-card,[data-liquid-glass]')) return 'card';
     const host=el.getRootNode()?.host;
     if(el.matches('dialog') && host?.localName==='wa-dialog') return 'dialog';
@@ -49,6 +73,7 @@
     const type=kind(el);
     if(!type || disabled(el)) return false;
     if(mobile && !mobileOverride && getComputedStyle(el).getPropertyValue('--liquid-glass-mobile').trim()!=='1') return false;
+    if(type==='sidebar') return getComputedStyle(el).getPropertyValue('--liquid-glass-sidebar').trim()==='1';
     if(type==='dialog') return getComputedStyle(el).getPropertyValue('--liquid-glass-dialogs').trim()==='1';
     // Avoid two filters on wrapper cards and their inner cards, across slots/shadow roots.
     for(let p=parent(el);p;p=parent(p)) if(kind(p)==='card' && !disabled(p)) return false;
@@ -116,13 +141,18 @@
   function update(el) {
     const state=panes.get(el);if(!state?.visible || !el.isConnected)return;
     const w=el.offsetWidth,h=el.offsetHeight;if(w<2||h<2)return;
+    const sidebar=kind(el)==='sidebar';
+    // Apply the radius before measuring it, so the optical map matches the
+    // visible pill on the first frame. The selector also wins over UIX fills.
+    const marker=sidebar?'sidebar':'';
+    if(el.getAttribute(mark)!==marker)el.setAttribute(mark,marker);
     const style=getComputedStyle(el);
-    const strength=number(style,'strength',72,0,160);
-    const blur=number(style,'blur',0,0,40);
+    const strength=sidebar?number(style,'sidebar-strength',54,0,160):number(style,'strength',72,0,160);
+    const blur=sidebar?number(style,'sidebar-blur',1.5,0,40):number(style,'blur',0,0,40);
     const requestedProfile=style.getPropertyValue('--liquid-glass-profile').trim();
     const profile=['legacy','convex'].includes(requestedProfile)?requestedProfile:'lens';
     // Keep opposing rims from crossing on short HA entity cards.
-    const edge=Math.min(number(style,'bevel',48,4,160),Math.min(w,h)/2);
+    const edge=Math.min(number(style,sidebar?'sidebar-bevel':'bevel',sidebar?24:48,4,160),Math.min(w,h)/2);
     const radiusValue=style.borderTopLeftRadius;
     const radius=Math.min(radiusValue.includes('%')?parseFloat(radiusValue)*Math.min(w,h)/100:parseFloat(radiusValue)||0,w/2,h/2);
     state.displacement.setAttribute('scale',strength);

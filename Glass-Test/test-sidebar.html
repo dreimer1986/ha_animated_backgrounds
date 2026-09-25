@@ -1,0 +1,34 @@
+<!doctype html><meta charset="utf-8"><title>Sidebar integration</title>
+<style>body{background:repeating-linear-gradient(25deg,#234 0 16px,#bac 16px 20px,#345 20px 40px);color:white;font:14px system-ui;--liquid-glass-enabled:1;--liquid-glass-mobile:1;--liquid-glass-sidebar:1}#report{position:fixed;left:330px;top:0;white-space:pre-wrap}ha-sidebar{display:block}</style>
+<ha-sidebar></ha-sidebar><ha-list-item-button id="outside">Outside sidebar</ha-list-item-button><pre id="report">Running…</pre>
+<script src="sidebar-demo.js"></script><script src="../www/ha-liquid-glass.js"></script>
+<script>
+(async()=>{
+const report=document.querySelector('#report'),lines=[];
+const wait=async()=>{haLiquidGlass.refresh();await new Promise(r=>setTimeout(r,450))};
+const check=(label,condition)=>{lines.push((condition?'PASS ':'FAIL ')+label);report.textContent=lines.join('\n');if(!condition)throw Error(label)};
+try{
+await wait();const host=document.querySelector('ha-sidebar'),root=host.shadowRoot,items=[...root.querySelectorAll('ha-list-item-button')];
+check('all eight sidebar entries detected',items.every(el=>el.getAttribute('data-ha-liquid-glass')==='sidebar'));
+check('ordinary list outside sidebar unaffected',!document.querySelector('#outside').hasAttribute('data-ha-liquid-glass'));
+check('no enclosing backdrop root added',getComputedStyle(host).backdropFilter==='none');
+check('pill shape active',getComputedStyle(items[0]).borderTopLeftRadius==='22px');
+check('sidebar-specific blur applied',getComputedStyle(items[0]).backdropFilter.startsWith('blur(1.5px)'));
+const filterFor=el=>root.getElementById(el.style.getPropertyValue('--ha-lg-filter').match(/#([^\"]+)/)[1]);
+check('sidebar-specific strength applied',filterFor(items[0]).querySelector('feDisplacementMap').getAttribute('scale')==='54');
+const href=items[1].shadowRoot.querySelector('a').getAttribute('href');items[1].shadowRoot.querySelector('a').click();
+check('selection and original link target survive',items[1].classList.contains('selected')&&items[1].shadowRoot.querySelector('a').getAttribute('href')===href);
+items[1].shadowRoot.querySelector('a').focus();check('keyboard focus survives',items[1].shadowRoot.activeElement.localName==='a');
+host.setAttribute('collapsed','');await wait();check('collapse resizes filters',Number(filterFor(items[0]).getAttribute('width'))===items[0].offsetWidth&&items[0].offsetWidth<60);
+host.style.setProperty('--liquid-glass-sidebar-strength','80');await wait();check('sidebar setting refreshes',filterFor(items[0]).querySelector('feDisplacementMap').getAttribute('scale')==='80');
+host.style.setProperty('--liquid-glass-sidebar','0');await wait();check('sidebar opt-out restores original radius',items.every(el=>!el.hasAttribute('data-ha-liquid-glass'))&&getComputedStyle(items[0]).borderTopLeftRadius==='4px');
+host.style.setProperty('--liquid-glass-sidebar','1');await wait();check('sidebar opt-in restores effect',items.every(el=>el.hasAttribute('data-ha-liquid-glass')));
+host.setAttribute('data-liquid-glass-ignore','');await wait();check('ancestor ignore respected',items.every(el=>!el.hasAttribute('data-ha-liquid-glass')));host.removeAttribute('data-liquid-glass-ignore');await wait();
+const dynamic=document.createElement('ha-list-item-button');dynamic.textContent='Dynamic';root.querySelector('nav').append(dynamic);await wait();check('dynamic navigation detected',dynamic.hasAttribute('data-ha-liquid-glass'));dynamic.remove();await wait();check('removed navigation cleaned',haLiquidGlass.status.surfaces===8);
+const menuButton=document.createElement('ha-icon-button');menuButton.style.cssText='display:block;width:40px;height:40px';root.querySelector('.menu').prepend(menuButton);await wait();check('sidebar header button gets circular glass',menuButton.getAttribute('data-ha-liquid-glass')==='sidebar');menuButton.remove();await wait();
+const legacy=document.createElement('paper-icon-item');legacy.setAttribute('role','option');legacy.style.cssText='display:block;width:240px;height:44px';root.querySelector('nav').append(legacy);await wait();check('older sidebar entries supported',legacy.getAttribute('data-ha-liquid-glass')==='sidebar');legacy.remove();await wait();
+haLiquidGlass.stop();check('stop cleans sidebar and filters',!root.querySelector('[data-ha-liquid-glass]')&&!root.querySelector('[data-ha-lg-owned]')&&!items[0].style.getPropertyValue('--ha-lg-filter'));
+report.textContent+='\nALL TESTS PASSED';
+}catch(error){report.textContent+='\nERROR '+error.stack}
+})();
+</script>

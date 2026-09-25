@@ -1,8 +1,29 @@
-# Home Assistant Liquid Glass · 0.4.0
+# Home Assistant Liquid Glass · 0.5.0
 
 Experimentelles Frontend-Modul aus dem visuellen Prototyp. Es enthält CSS und JavaScript in einer Datei. Kein UIX erforderlich; UIX kann zusätzlich für Ausnahmen genutzt werden. Keine Verbindung zu Diensten, kein Token nötig.
 
-## Neu in 0.4.0: Linsenprofil „Glasmurmel“
+## Neu in 0.5.0: Sidebar mit UIX
+
+Das Modul kann einzelne Navigationseinträge innerhalb von `ha-sidebar` als Glasflächen behandeln. Die aktualisierten drei Your-Name-Themevarianten aktivieren diese Option und entfernen für aktive Glasflächen den bisherigen UIX-Kartenhintergrund. Die Sidebar selbst bleibt transparent: kein zusätzlicher großer Backdrop-Filter vor den einzelnen Linsen.
+
+```yaml
+  liquid-glass-sidebar: "1"
+  liquid-glass-sidebar-strength: "54"
+  liquid-glass-sidebar-bevel: "24"
+  liquid-glass-sidebar-blur: "1.5"
+  liquid-glass-sidebar-radius: "22px"
+  liquid-glass-sidebar-background: "linear-gradient(135deg,rgba(255,255,255,.14),rgba(16,12,42,.16))"
+```
+
+Optional `liquid-glass-sidebar-shadow` für eigene Lichtkanten/Schatten (CSS box-shadow). Ohne diese Variable nutzt die Sidebar feinere, kürzere Schatten als große Karten. Stärke 0–160, Kantenbreite 4–160 und Mattierung 0–40 entsprechen den Grenzen der Karten. Die Sidebar nutzt das allgemeine Profil und den allgemeinen Weißanteil. Ihre Stärke, Kantenbreite, Mattierung, Rundung, Hintergrund und Schatten haben eigene Voreinstellungen; die Karten bleiben unverändert.
+
+`liquid-glass-sidebar: "0"` schaltet die Sidebar-Erweiterung aus. Ohne gesetzte Variable bleibt sie ebenfalls aus. Der Konfigurator zeigt alle sieben zusätzlichen Variablen und eine strukturell nachgebildete Sidebar mit Auswahl, Benachrichtigungsbadge und schmaler Symbolleiste. Das ist eine lokale Vorschau, kein laufendes HA-Frontend.
+
+Die Erkennung beschränkt sich auf `ha-list-item-button`, `ha-md-list-item`, passende ältere `paper-icon-item` und den Menü-Iconbutton innerhalb der Sidebar. Listen außerhalb der Navigation bleiben unberührt. Der ursprüngliche Link, Fokus, Badge und Auswahlzustand bleiben erhalten. UIX liefert beim Abschalten wieder die bisherige Kartenfüllung. Der Scrim der mobilen Schublade wird nicht verändert.
+
+**Update:** `www/ha-liquid-glass.js` nach `/config/www/ha-liquid-glass.js` kopieren, die verwendeten Theme-YAMLs aus `yourname_uix/themes/` aktualisieren, Themes neu laden und die Modul-URL auf `?v=0.5.0` ändern. Anschließend Browser/App-Frontend neu laden. Für eine Sidebar auf allen HA-Seiten das Modul über den bestehenden `frontend.extra_module_url`-Block laden.
+
+## Seit 0.4.0: Linsenprofil „Glasmurmel“
 
 `liquid-glass-profile: "lens"` ist das neue Standardprofil. Die frühere breit verschiebende Randkurve wird durch eine aus Snells Gesetz abgeleitete Kurve für eine sphärische Eintrittsfläche ersetzt (Brechungsindex 1.5). Sie vergrößert im Inneren gleichmäßiger und biegt das Hintergrundbild nahe dem äußeren Rand stärker um. Kreise erhalten radiale Brechung; Kapseln haben runde Enden und einen zylindrischen Querschnitt im langen Mittelteil.
 
@@ -23,11 +44,11 @@ Einstellbare Milchglas-Mattierung mit zwei unabhängigen Theme-Werten:
 - `liquid-glass-blur`: 0–40 CSS-Pixel, Standard 0. Macht den Hintergrund vor der Brechung unscharf; der Karteninhalt bleibt scharf.
 - `liquid-glass-frost`: 0–1, Standard 0. Weißer Schleier über dem Hintergrund; 1 ist vollständig deckend. Beispiel für Milchglas: Blur 12, Frost 0.18.
 
-`Glass-Vergleich.html` und `Liquid-Glass-Demo.html` sind eigenständige Theme-Konfiguratoren. Sie verwenden dasselbe HA-Modul und dieselben CSS-Variablen wie die Installation. Alle zehn Modulvariablen sind einstellbar: Aktivierung, mobile Freischaltung, Stärke, Kantenbreite, Mattierung, Weißanteil, Profil, Hintergrund, Schatten und Dialoge. Der YAML-Block übernimmt genau die gültigen Formularwerte. Ungültige CSS-Eingaben ändern weder Vorschau noch Export. „YAML kopieren“ kopiert die Werte; falls der Browser den Zugriff verweigert, wird der Text zur manuellen Übernahme markiert.
+`Glass-Vergleich.html` und `Liquid-Glass-Demo.html` sind eigenständige Theme-Konfiguratoren. Sie verwenden dasselbe HA-Modul und dieselben CSS-Variablen wie die Installation. Alle 17 Modulvariablen einschließlich der sieben Sidebar-Optionen sind einstellbar: Aktivierung, mobile Freischaltung, Stärke, Kantenbreite, Mattierung, Weißanteil, Profil, Hintergrund, Schatten und Dialoge. Der YAML-Block übernimmt genau die gültigen Formularwerte. Ungültige CSS-Eingaben ändern weder Vorschau noch Export. „YAML kopieren“ kopiert die Werte; falls der Browser den Zugriff verweigert, wird der Text zur manuellen Übernahme markiert.
 
 Die linke Vergleichskarte verwendet standardmäßig das bisherige gewölbte Profil mit 72 / 48 (umschaltbar auf das Original mit 22 / 26), rechts gelten die Formularwerte. Die Dialog-Vorschau verwendet ein simuliertes `wa-dialog` mit offenem Shadow Root. Hintergrundwahl, eigene lokale Bilder und Bewegung sind reine Vorschau-Einstellungen und werden nicht exportiert. Abmessungen, Radien und Hintergründe beeinflussen das Ergebnis auch in HA.
 
-**Update:** JavaScript-Datei ersetzen, Ressourcen-URL auf `?v=0.4.0` ändern und Browser neu laden. Theme-Werte aus dem Konfigurator im bestehenden Theme auf derselben Ebene wie `ha-card-background` eintragen; gleichnamige alte Einträge ersetzen. Die Versionsstände 0.1.0, 0.2.0 und 0.3.0 bleiben in ihren ZIPs und unter `backups/` erhalten.
+**Update:** JavaScript-Datei ersetzen, Ressourcen-URL auf `?v=0.5.0` ändern und Browser neu laden. Theme-Werte aus dem Konfigurator im bestehenden Theme auf derselben Ebene wie `ha-card-background` eintragen; gleichnamige alte Einträge ersetzen. Die älteren Versionsstände bleiben im ursprünglichen Download-Ordner erhalten; das Git-Repository ist die aktuelle Entwicklungsbasis.
 
 Das gewölbte Profil verwendet standardmäßig Stärke **72** und Kantenbreite **48**; „Extra dick“ stellt **110 / 64** ein. `liquid-glass-profile: "lens"` ist das Standardprofil; `"convex"` erhält das bisherige gewölbte Profil und `"legacy"` wählt die ursprüngliche Kurve. Alle bleiben optische Näherungen.
 
@@ -39,7 +60,7 @@ Die Datei `ha-liquid-glass.js` nach `/config/www/ha-liquid-glass.js` kopieren (j
 
 Einstellungen → Dashboards → Ressourcen (gegebenenfalls erweiterten Modus im Profil aktivieren):
 
-- URL: `/local/ha-liquid-glass.js?v=0.4.0`
+- URL: `/local/ha-liquid-glass.js?v=0.5.0`
 - Typ: **JavaScript-Modul**
 
 Dashboard neu laden. Ressourcen sind nicht auf eine einzelne Ansicht beschränkt. Das Modul bleibt in dieser Browserseite aktiv, bis sie neu geladen wird.
@@ -47,7 +68,7 @@ Dashboard neu laden. Ressourcen sind nicht auf eine einzelne Ansicht beschränkt
 Bei YAML-verwalteten Ressourcen lautet der Eintrag unter der vorhandenen `lovelace.resources`-Liste:
 
 ```yaml
-- url: /local/ha-liquid-glass.js?v=0.4.0
+- url: /local/ha-liquid-glass.js?v=0.5.0
   type: module
 ```
 
@@ -60,14 +81,14 @@ frontend:
   themes: !include_dir_merge_named themes
   extra_module_url:
     - /local/styles.js?v=1.5
-    - /local/ha-liquid-glass.js?v=0.4.0
+    - /local/ha-liquid-glass.js?v=0.5.0
 ```
 
 Die vorhandene URL deines Hintergrundskripts unverändert übernehmen; die obige Version ist nur ein Beispiel. Konfiguration prüfen, HA neu starten und Browser vollständig neu laden. Nur Theme-Neuladen aktiviert keinen neuen `extra_module_url`-Eintrag.
 
 ## Verhalten und Einstellungen
 
-Standardmäßig aktiviert sich der Effekt in Desktop Chrome/Edge für äußere `ha-card`-Flächen, auch in offenen Shadow Roots. Andere Browser und standardmäßig mobile User Agents werden ausgelassen und behalten das bestehende Theme. Die mobile Sperre ist eine konservative Einschränkung des Prototyps, kein belegter genereller Ausschluss von SVG-Backdrop-Filtern auf Android. Echte Android-Geräte wurden hier nicht getestet. Diese Eingrenzung ist keine vollständige Rendering-Erkennung.
+Standardmäßig aktiviert sich der Effekt in Desktop Chrome/Edge für äußere `ha-card`-Flächen, auch in offenen Shadow Roots. Andere Browser und standardmäßig mobile User Agents werden ausgelassen und behalten das bestehende Theme. Die mobile Sperre ist eine konservative Einschränkung des Prototyps, kein belegter genereller Ausschluss von SVG-Backdrop-Filtern auf Android. Der Nutzer hat Version 0.4 erfolgreich in Chrome für Android und in der offiziellen Home-Assistant-App getestet. Die neue Sidebar wurde hier lokal geprüft; ihr Gerätetest steht noch aus. Diese Eingrenzung ist keine vollständige Rendering-Erkennung.
 
 Größe und Rundung werden automatisch erfasst; die Rundung der linken oberen Ecke dient als Näherung für alle vier Ecken. Neue Karten, Theme-Wechsel und spät erstellte Shadow Roots werden spätestens beim 3-Sekunden-Abgleich erkannt. Entfernte Karten werden aufgeräumt. Es gibt keinen Hintergrund-Screenshot und keine laufende Video-Kopie. Verzerrungskarten werden nur bei Größen-/Formänderungen neu erzeugt. Große Filtertexturen werden auf maximal 768 Pixel je Achse begrenzt.
 
@@ -99,7 +120,7 @@ Dies hebt nur die vorsorgliche mobile Sperre auf. Die Chromium-/Syntaxprüfung b
 
 `liquid-glass-dialogs: "1"` aktiviert zusätzlich erkannte `wa-dialog`-Dialogflächen und ältere MDC-Dialogflächen. Das ist versionsabhängig und wurde noch nicht an deiner HA-Installation geprüft. Ein vorhandener dunkler/unscharfer Dialog-Scrim bleibt erhalten und kann die Brechung weniger sichtbar machen. Innere Karten bleiben eigene Glasflächen: bei solchen Verschachtelungen gelten die Backdrop-Root-Grenzen des Browsers.
 
-Header, Sidebar, Menüs, geschlossene Shadow Roots und Custom Cards ohne `ha-card` werden nicht automatisch verändert. Ein eigenes erreichbares DOM-Element lässt sich mit `data-liquid-glass` ausdrücklich markieren; dies ist kein beliebiger Lovelace-YAML-Schlüssel.
+Dashboard-Header, sonstige Menüs, geschlossene Shadow Roots und Custom Cards ohne `ha-card` werden nicht automatisch verändert. Ein eigenes erreichbares DOM-Element lässt sich mit `data-liquid-glass` ausdrücklich markieren; dies ist kein beliebiger Lovelace-YAML-Schlüssel.
 
 ### Einzelne Karte ausschließen (UIX)
 
@@ -121,8 +142,12 @@ Alternativ an einem Element/Container das DOM-Attribut `data-liquid-glass-ignore
 
 ## Testumfang
 
-Mit Version 0.4.0 in lokalem Headless-Chrome bestanden: Erkennung in Shadow Roots, Ausschluss innerer Karten, Filterreferenz im selben DOM-Baum, Größenänderung, Hinzufügen/Entfernen von Karten, Deaktivieren/Reaktivieren per CSS-Variable, doppeltes Laden ohne doppelte Instanz und vollständiges Aufräumen beim Stoppen. Zusätzlich geprüft: stärkerer Standardwert, neutraler Mittelpunkt, mehr als 30 CSS-Pixel Randversatz, Stärke 0 und 110 sowie Profilwechsel. Zusätzlich geprüft: radiale Symmetrie, gegenüberliegende Linsenseiten, gleicher Kreis-/Kapselquerschnitt, Vergrößerung ohne Umkehr im Inneren, Umkehr nahe dem Rand und die weiterhin auswählbare alte Kurve. Den Vorher/Nachher-Vergleich visuell kontrolliert. Die Tests sind in `test-module.html` enthalten. Zusätzlich wurden Mattierung, Weißanteil, unverzerrter Karteninhalt, Rückkehr zu Klarglas und die Blur-Obergrenze geprüft. Der Konfigurator wurde auf direkte Dateiöffnung, YAML-/Vorschau-Übereinstimmung, Voreinstellungen, Dialoge, CSS-Validierung, Kopieren und schmale Fenster geprüft.
+Mit Version 0.5.0 in lokalem Headless-Chrome bestanden: Erkennung in Shadow Roots, Ausschluss innerer Karten, Filterreferenz im selben DOM-Baum, Größenänderung, Hinzufügen/Entfernen von Karten, Deaktivieren/Reaktivieren per CSS-Variable, doppeltes Laden ohne doppelte Instanz und vollständiges Aufräumen beim Stoppen. Zusätzlich geprüft: stärkerer Standardwert, neutraler Mittelpunkt, starker Randversatz, Stärke 0 und 110 sowie Profilwechsel. Zusätzlich geprüft: radiale Symmetrie, gegenüberliegende Linsenseiten, gleicher Kreis-/Kapselquerschnitt, Vergrößerung ohne Umkehr im Inneren, Umkehr nahe dem Rand und die weiterhin auswählbare alte Kurve. Den Vorher/Nachher-Vergleich visuell kontrolliert. Die Tests sind in `test-module.html` enthalten. Zusätzlich wurden Mattierung, Weißanteil, unverzerrter Karteninhalt, Rückkehr zu Klarglas und die Blur-Obergrenze geprüft. Der Konfigurator wurde auf direkte Dateiöffnung, YAML-/Vorschau-Übereinstimmung, Voreinstellungen, Dialoge, CSS-Validierung, Kopieren und schmale Fenster geprüft.
 
 Keine Freigabe für alle HA-Karten oder HA-Versionen. Noch nicht an deiner laufenden HA-Installation getestet. Besonders zu prüfen: Standardkarten, Navigation, Fenstergröße, More-Info-Dialog über Karten und Lesbarkeit vor deinem animierten Hintergrund.
 
 Quellen: https://www.home-assistant.io/integrations/frontend/#loading-extra-javascript und https://developers.home-assistant.io/docs/frontend/custom-ui/registering-resources/
+
+Sidebar-Tests: Erkennung nur innerhalb der Sidebar, eigene Parameter, Rundung, Auswahl, Linkziel, Tastaturfokus, Ein-/Ausklappen, Laufzeitänderungen, Aus-/Einschalten, Ignore-Attribut, dynamische Einträge und vollständiges Aufräumen. Die tatsächlichen UIX-Regeln aller drei Themevarianten wurden im lokalen Sidebar-Modell auf aktive Glaseffekte und Rückkehr zur ursprünglichen Füllung geprüft.
+
+Quellstruktur der Navigation: https://github.com/home-assistant/frontend/blob/dev/src/components/ha-sidebar.ts und https://github.com/home-assistant/frontend/blob/dev/src/components/item/ha-list-item-button.ts (Referenz, keine Garantie für jede HA-Version).
