@@ -299,6 +299,10 @@ These are the very same pics shown on my own Modified Theme Repo: https://github
 
 ## Liquid Glass and UIX sidebar
 
-The optional frontend module is in [`www/ha-liquid-glass.js`](www/ha-liquid-glass.js). Version 0.5 adds individual glass sidebar buttons, coordinated with the updated Your Name UIX themes. Install it as `/local/ha-liquid-glass.js?v=0.5.0`; use `frontend.extra_module_url` for loading on all HA pages. The animated-background script is unchanged. See [installation and theme settings](Glass-Test/INSTALL.md) and the [offline configurator](Glass-Test/Glass-Vergleich.html).
+The optional frontend module is in [`www/ha-liquid-glass.js`](www/ha-liquid-glass.js). Version 0.5 adds individual glass sidebar buttons, coordinated with the updated Your Name UIX themes. Install it as `/local/ha-liquid-glass.js?v=0.6.0`; use `frontend.extra_module_url` for loading on all HA pages. Update the animated-background script to `/local/styles.js?v=1.6.0` too: page-specific videos no longer wait for weather data, configuration fetches have a timeout, and route events update the source immediately. See [installation and theme settings](Glass-Test/INSTALL.md) and the [offline configurator](Glass-Test/Glass-Vergleich.html).
 
 The user confirmed the version 0.4 glass effect works in Chrome on Android and the official Home Assistant app. The new sidebar integration has been checked locally and still needs validation on the actual device.
+
+### Faster startup and navigation (styles.js 1.6.0 / glass 0.6.0)
+
+Replace the existing module URLs with `/local/styles.js?v=1.6.0` and `/local/ha-liquid-glass.js?v=0.6.0`, then fully reload the frontend. Keep existing theme values. For loading across all HA pages, use the existing `frontend.extra_module_url` list. Optional JSON loads asynchronously with a two-second timeout; built-in backgrounds work while it loads. HA helper/weather changes are picked up within 500 ms, with no weather retry delay on page transitions. The video continues when the selected pool is unchanged. Diagnostics: `window.haAnimatedBackgrounds.status`; stop with `.stop()`. Glass now observes new open shadow roots directly and caches identical displacement textures. See `Glass-Test/INSTALL.md` for measurements and remaining browser/rendering limits.

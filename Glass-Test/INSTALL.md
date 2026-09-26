@@ -1,8 +1,22 @@
-# Home Assistant Liquid Glass · 0.5.0
+# Home Assistant Liquid Glass · 0.6.0
 
 Experimentelles Frontend-Modul aus dem visuellen Prototyp. Es enthält CSS und JavaScript in einer Datei. Kein UIX erforderlich; UIX kann zusätzlich für Ausnahmen genutzt werden. Keine Verbindung zu Diensten, kein Token nötig.
 
-## Neu in 0.5.0: Sidebar mit UIX
+## Neu in 0.6.0: schnellere Erkennung und stabile Seitenwechsel
+
+Das Glasmodul beobachtet jetzt alle erkannten offenen Shadow Roots, auch wenn sie zunächst leer sind. Hinzugefügte Teilbäume werden gezielt durchsucht. Ein reversibler Wrapper um `Element.prototype.attachShadow` erfasst später angelegte offene Roots sofort, lässt Optionen/Rückgabewert unverändert und wird beim Stoppen wieder entfernt, sofern kein anderes Skript ihn inzwischen ersetzt hat. Theme-Attribute, Inline-Styles, Style-Elemente und Navigation lösen die Aktualisierung im nächsten Animationsframe aus.
+
+Gleich geformte Flächen teilen sich die berechnete Verzerrungstextur (LRU-Cache: höchstens 64 Einträge bzw. geschätzte 16 MiB Pixeldaten). Die SVG-Filter bleiben jeweils im richtigen Shadow Root. Stoppen und entfernte Seiten räumen Observer, Filter und Cache auf. Das optische Modell und die Theme-Werte bleiben unverändert.
+
+Zwei Sicherheitsnetze bleiben: alle zwei Sekunden werden nur die bekannten Kandidaten abgeglichen (z. B. für direkte CSSOM-/adoptedStyleSheet-Änderungen), alle 15 Sekunden wird die gesamte Struktur geprüft. Reguläres Einfügen, Theme-Attributänderungen und Seitenwechsel warten nicht darauf. `window.haLiquidGlass.status` zeigt unter anderem `watchedRoots`, `cachedTextures`, `mapBuilds`, `cacheHits`, `visited` und `scans` zur Diagnose.
+
+**Beide Dateien aktualisieren:** `www/ha-liquid-glass.js` als `/local/ha-liquid-glass.js?v=0.6.0` und `www/styles.js` als `/local/styles.js?v=1.6.0`. Bestehende Ressourcen-/Frontend-Einträge ersetzen, keine zusätzliche zweite Eintragung anlegen; danach Browser/App-Frontend vollständig neu laden. Für sofortige Erkennung auch außerhalb von Dashboards über `frontend.extra_module_url` laden. Die Theme-YAMLs brauchen für dieses Update keine Änderung. Das ZIP enthält beide Skripte.
+
+Das Hintergrundskript 1.6.0 wählt Seitenhintergründe sofort, ohne auf Wetterdaten zu warten. Die optionale JSON-Konfiguration blockiert weder Videolayout noch Seitenwechsel; bei einer hängenden Anfrage bleiben nach zwei Sekunden die eingebauten Werte aktiv. Später eintreffende HA-Zustände/Helper werden alle 500 ms nachgezogen. `location-changed`, Browser-Zurück/Vorwärts und Wiederaufnahme der Seite werden direkt verarbeitet. Bei gleichem Videopool wird das laufende Video nicht neu ausgewählt. Wiederholtes Laden erzeugt keine zweite Instanz. Status und Rückweg: `window.haAnimatedBackgrounds.status` und `.stop()`.
+
+Lokaler Headless-Chrome-Vergleich mit künstlich verspäteten DOM-Bereichen: Erkennung leerer/später Shadow Roots vorher ca. 2.8–3.0 s, nachher ca. 30–34 ms; Inline-Opt-out vorher ca. 3.0 s, nachher ca. 15 ms. Videowahl bei fehlenden Wetterdaten vorher ca. 2.5–3.0 s, nachher ca. 8–21 ms. Diese Messung betrifft DOM-Erkennung und Quellwahl, nicht Video-Download, Decodierung oder reale Geräteleistung.
+
+## Seit 0.5.0: Sidebar mit UIX
 
 Das Modul kann einzelne Navigationseinträge innerhalb von `ha-sidebar` als Glasflächen behandeln. Die aktualisierten drei Your-Name-Themevarianten aktivieren diese Option und entfernen für aktive Glasflächen den bisherigen UIX-Kartenhintergrund. Die Sidebar selbst bleibt transparent: kein zusätzlicher großer Backdrop-Filter vor den einzelnen Linsen.
 
@@ -21,7 +35,7 @@ Optional `liquid-glass-sidebar-shadow` für eigene Lichtkanten/Schatten (CSS box
 
 Die Erkennung beschränkt sich auf `ha-list-item-button`, `ha-md-list-item`, passende ältere `paper-icon-item` und den Menü-Iconbutton innerhalb der Sidebar. Listen außerhalb der Navigation bleiben unberührt. Der ursprüngliche Link, Fokus, Badge und Auswahlzustand bleiben erhalten. UIX liefert beim Abschalten wieder die bisherige Kartenfüllung. Der Scrim der mobilen Schublade wird nicht verändert.
 
-**Update:** `www/ha-liquid-glass.js` nach `/config/www/ha-liquid-glass.js` kopieren, die verwendeten Theme-YAMLs aus `yourname_uix/themes/` aktualisieren, Themes neu laden und die Modul-URL auf `?v=0.5.0` ändern. Anschließend Browser/App-Frontend neu laden. Für eine Sidebar auf allen HA-Seiten das Modul über den bestehenden `frontend.extra_module_url`-Block laden.
+**Update:** `www/ha-liquid-glass.js` nach `/config/www/ha-liquid-glass.js` kopieren, die verwendeten Theme-YAMLs aus `yourname_uix/themes/` aktualisieren, Themes neu laden und die Modul-URL auf `?v=0.6.0` ändern. Anschließend Browser/App-Frontend neu laden. Für eine Sidebar auf allen HA-Seiten das Modul über den bestehenden `frontend.extra_module_url`-Block laden.
 
 ## Seit 0.4.0: Linsenprofil „Glasmurmel“
 
@@ -48,7 +62,7 @@ Einstellbare Milchglas-Mattierung mit zwei unabhängigen Theme-Werten:
 
 Die linke Vergleichskarte verwendet standardmäßig das bisherige gewölbte Profil mit 72 / 48 (umschaltbar auf das Original mit 22 / 26), rechts gelten die Formularwerte. Die Dialog-Vorschau verwendet ein simuliertes `wa-dialog` mit offenem Shadow Root. Hintergrundwahl, eigene lokale Bilder und Bewegung sind reine Vorschau-Einstellungen und werden nicht exportiert. Abmessungen, Radien und Hintergründe beeinflussen das Ergebnis auch in HA.
 
-**Update:** JavaScript-Datei ersetzen, Ressourcen-URL auf `?v=0.5.0` ändern und Browser neu laden. Theme-Werte aus dem Konfigurator im bestehenden Theme auf derselben Ebene wie `ha-card-background` eintragen; gleichnamige alte Einträge ersetzen. Die älteren Versionsstände bleiben im ursprünglichen Download-Ordner erhalten; das Git-Repository ist die aktuelle Entwicklungsbasis.
+**Update:** JavaScript-Datei ersetzen, Ressourcen-URL auf `?v=0.6.0` ändern und Browser neu laden. Theme-Werte aus dem Konfigurator im bestehenden Theme auf derselben Ebene wie `ha-card-background` eintragen; gleichnamige alte Einträge ersetzen. Die älteren Versionsstände bleiben im ursprünglichen Download-Ordner erhalten; das Git-Repository ist die aktuelle Entwicklungsbasis.
 
 Das gewölbte Profil verwendet standardmäßig Stärke **72** und Kantenbreite **48**; „Extra dick“ stellt **110 / 64** ein. `liquid-glass-profile: "lens"` ist das Standardprofil; `"convex"` erhält das bisherige gewölbte Profil und `"legacy"` wählt die ursprüngliche Kurve. Alle bleiben optische Näherungen.
 
@@ -60,7 +74,7 @@ Die Datei `ha-liquid-glass.js` nach `/config/www/ha-liquid-glass.js` kopieren (j
 
 Einstellungen → Dashboards → Ressourcen (gegebenenfalls erweiterten Modus im Profil aktivieren):
 
-- URL: `/local/ha-liquid-glass.js?v=0.5.0`
+- URL: `/local/ha-liquid-glass.js?v=0.6.0`
 - Typ: **JavaScript-Modul**
 
 Dashboard neu laden. Ressourcen sind nicht auf eine einzelne Ansicht beschränkt. Das Modul bleibt in dieser Browserseite aktiv, bis sie neu geladen wird.
@@ -68,7 +82,7 @@ Dashboard neu laden. Ressourcen sind nicht auf eine einzelne Ansicht beschränkt
 Bei YAML-verwalteten Ressourcen lautet der Eintrag unter der vorhandenen `lovelace.resources`-Liste:
 
 ```yaml
-- url: /local/ha-liquid-glass.js?v=0.5.0
+- url: /local/ha-liquid-glass.js?v=0.6.0
   type: module
 ```
 
@@ -81,7 +95,7 @@ frontend:
   themes: !include_dir_merge_named themes
   extra_module_url:
     - /local/styles.js?v=1.5
-    - /local/ha-liquid-glass.js?v=0.5.0
+    - /local/ha-liquid-glass.js?v=0.6.0
 ```
 
 Die vorhandene URL deines Hintergrundskripts unverändert übernehmen; die obige Version ist nur ein Beispiel. Konfiguration prüfen, HA neu starten und Browser vollständig neu laden. Nur Theme-Neuladen aktiviert keinen neuen `extra_module_url`-Eintrag.
@@ -90,7 +104,7 @@ Die vorhandene URL deines Hintergrundskripts unverändert übernehmen; die obige
 
 Standardmäßig aktiviert sich der Effekt in Desktop Chrome/Edge für äußere `ha-card`-Flächen, auch in offenen Shadow Roots. Andere Browser und standardmäßig mobile User Agents werden ausgelassen und behalten das bestehende Theme. Die mobile Sperre ist eine konservative Einschränkung des Prototyps, kein belegter genereller Ausschluss von SVG-Backdrop-Filtern auf Android. Der Nutzer hat Version 0.4 erfolgreich in Chrome für Android und in der offiziellen Home-Assistant-App getestet. Die neue Sidebar wurde hier lokal geprüft; ihr Gerätetest steht noch aus. Diese Eingrenzung ist keine vollständige Rendering-Erkennung.
 
-Größe und Rundung werden automatisch erfasst; die Rundung der linken oberen Ecke dient als Näherung für alle vier Ecken. Neue Karten, Theme-Wechsel und spät erstellte Shadow Roots werden spätestens beim 3-Sekunden-Abgleich erkannt. Entfernte Karten werden aufgeräumt. Es gibt keinen Hintergrund-Screenshot und keine laufende Video-Kopie. Verzerrungskarten werden nur bei Größen-/Formänderungen neu erzeugt. Große Filtertexturen werden auf maximal 768 Pixel je Achse begrenzt.
+Größe und Rundung werden automatisch erfasst; die Rundung der linken oberen Ecke dient als Näherung für alle vier Ecken. Neue Karten, Theme-Attributänderungen und spät erstellte offene Shadow Roots werden ereignisgesteuert erkannt. Direkte CSSOM-Änderungen können bis zum 2-Sekunden-Kandidatenabgleich benötigen. Entfernte Karten werden aufgeräumt. Es gibt keinen Hintergrund-Screenshot und keine laufende Video-Kopie. Verzerrungskarten werden nur bei Größen-/Formänderungen neu erzeugt. Große Filtertexturen werden auf maximal 768 Pixel je Achse begrenzt.
 
 Optional im **bestehenden Theme** ergänzen (gleiche Einrückung wie `ha-card-background`):
 
@@ -106,11 +120,11 @@ Optional im **bestehenden Theme** ergänzen (gleiche Einrückung wie `ha-card-ba
   liquid-glass-dialogs: "0"
 ```
 
-`strength`: 0–160 (SVG-Skalierung; maximaler tatsächlicher Versatz ungefähr die Hälfte), `bevel`: 4–160 CSS-Pixel. Bei flachen Karten wird die Kantenbreite automatisch auf die halbe Kartenhöhe begrenzt. `enabled: "0"` schaltet den Effekt für dieses Theme aus. Anschließend Themes neu laden. Die Filter werden nach spätestens drei Sekunden aktualisiert. Vorhandene Kartenabmessungen, Positionierung, Interaktion und Radien bleiben erhalten; Hintergrund, Schatten und Backdrop-Filter werden während der Aktivierung überschrieben.
+`strength`: 0–160 (SVG-Skalierung; maximaler tatsächlicher Versatz ungefähr die Hälfte), `bevel`: 4–160 CSS-Pixel. Bei flachen Karten wird die Kantenbreite automatisch auf die halbe Kartenhöhe begrenzt. `enabled: "0"` schaltet den Effekt für dieses Theme aus. Anschließend Themes neu laden. Die Filter werden ereignisgesteuert oder beim nächsten 2-Sekunden-Kandidatenabgleich aktualisiert. Vorhandene Kartenabmessungen, Positionierung, Interaktion und Radien bleiben erhalten; Hintergrund, Schatten und Backdrop-Filter werden während der Aktivierung überschrieben.
 
 ### Chrome auf Android freischalten
 
-Im Theme `liquid-glass-mobile: "1"` setzen und Themes neu laden. Die Änderung wird spätestens beim nächsten 3-Sekunden-Abgleich übernommen. `"0"` (Standard) deaktiviert die mobilen Glasflächen wieder. In der Testseite gibt es denselben Schalter; er gilt dort auch für die linke Vergleichsfläche.
+Im Theme `liquid-glass-mobile: "1"` setzen und Themes neu laden. Die Änderung wird spätestens beim nächsten 2-Sekunden-Kandidatenabgleich übernommen. `"0"` (Standard) deaktiviert die mobilen Glasflächen wieder. In der Testseite gibt es denselben Schalter; er gilt dort auch für die linke Vergleichsfläche.
 
 Für einen einmaligen Test ohne Theme-Änderung `?liquid_glass_mobile=on` an die HA-URL hängen (bei vorhandenen Parametern `&liquid_glass_mobile=on`) und neu laden. Dieser URL-Schalter übersteuert die mobile Sperre, aber nicht `liquid-glass-enabled: "0"` oder `?liquid_glass=off`. Zum Rückweg den Parameter entfernen und neu laden.
 
@@ -151,3 +165,5 @@ Quellen: https://www.home-assistant.io/integrations/frontend/#loading-extra-java
 Sidebar-Tests: Erkennung nur innerhalb der Sidebar, eigene Parameter, Rundung, Auswahl, Linkziel, Tastaturfokus, Ein-/Ausklappen, Laufzeitänderungen, Aus-/Einschalten, Ignore-Attribut, dynamische Einträge und vollständiges Aufräumen. Die tatsächlichen UIX-Regeln aller drei Themevarianten wurden im lokalen Sidebar-Modell auf aktive Glaseffekte und Rückkehr zur ursprünglichen Füllung geprüft.
 
 Quellstruktur der Navigation: https://github.com/home-assistant/frontend/blob/dev/src/components/ha-sidebar.ts und https://github.com/home-assistant/frontend/blob/dev/src/components/item/ha-list-item-button.ts (Referenz, keine Garantie für jede HA-Version).
+
+Zusätzliche Regressionstests: `test-lifecycle.html` (späte Shadow Roots, Theme-Änderungen ohne refresh, Texturcache, Root-Wechsel, Bereinigung) und `test-background.html` (sofortige Quellwahl, schnelle Seitenwechsel, Idempotenz). Die Hintergrundtests verwenden künstliche Konfiguration/Medienaufrufe und prüfen keine tatsächliche Videowiedergabe. Über lokalen HTTP-Server aus dem Repository-Root öffnen.

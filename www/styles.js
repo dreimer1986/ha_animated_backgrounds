@@ -1,5 +1,8 @@
+(() => {
+'use strict';
+if (window.haAnimatedBackgrounds) return;
 console.info(
-    '%c  ANIMATED-BACKGROUNDS  %c  version 1.5.1 (Universal)  %c  by dreimer1986 ',
+    '%c  ANIMATED-BACKGROUNDS  %c  version 1.6.0 (Universal)  %c  by dreimer1986 ',
              'color: orange; font-weight: bold; background: black',
              'color: white; font-weight: bold; background: dimgray',
              'color: white; font-weight: bold; background: rgb(71, 170, 238)',
@@ -62,14 +65,17 @@ let videoFiles = {
 let lastPathname = window.location.pathname;
 let currentIntervalId = null;
 let currentSwitchPeriod = videoSwitchPeriod_;
+let routeTimer, stopped=false, initialized=false, currentPool='', selectedURL='';
+let configController, configTimeout, playPending=false, lastPlayAttempt=-Infinity;
+const metrics={sourceChanges:0,configState:'loading'};
 
-const delay = ms => new Promise(res => setTimeout(res, ms));
 
 const video = document.createElement('video');
 video.id = "myVideo";
 video.loop = true;
 video.muted = true;
 video.playsInline = true;
+video.preload = 'auto';
 
 function getHass() {
     const ha = document.querySelector('home-assistant');
@@ -81,52 +87,42 @@ function getHass() {
 
 async function loadExternalConfig() {
     try {
-        const response = await fetch(`${localVideoPath_}/config.json?t=${Date.now()}`);
+        configController=new AbortController();
+        configTimeout=setTimeout(()=>configController.abort(),2000);
+        const response = await fetch(`${localVideoPath_}/config.json`,{signal:configController.signal,cache:'no-cache'});
+        if(stopped)return;
         if (response.ok) {
             const json = await response.json();
             if (json && json.videoFiles) {
                 for (const key in json.videoFiles) {
                     if (Array.isArray(json.videoFiles[key])) {
-                        videoFiles[key] = json.videoFiles[key];
+                        const files=json.videoFiles[key].filter(file=>typeof file==='string'&&file.trim());
+                        if(files.length)videoFiles[key] = files;
                     }
                 }
+                metrics.configState='loaded';
                 console.info('ANIMATED-BACKGROUNDS: External config.json loaded successfully.');
             }
         } else {
-            console.info('ANIMATED-BACKGROUNDS: No optional config.json found. Using built-in defaults.');
+            metrics.configState='defaults';
         }
     } catch (e) {
-        console.warn('ANIMATED-BACKGROUNDS: Error parsing config.json. Using defaults.', e);
-    }
+        metrics.configState=e.name==='AbortError'?'timeout':'defaults';
+        if(!stopped)console.warn('ANIMATED-BACKGROUNDS: Optional config unavailable; defaults remain active.', e);
+    } finally {clearTimeout(configTimeout);if(!stopped&&metrics.configState==='loading')metrics.configState='defaults';}
 }
 
-async function fetchWeatherRobustly() {
-    for (let i = 0; i < 5; i++) {
-        const hass = getHass();
-        if (hass && hass.states) {
-            if (weatherControlHelper_ !== "" && hass.states[weatherControlHelper_]) {
-                weatherControl_ = (hass.states[weatherControlHelper_].state === "on");
-            }
-            if (weatherUseLocalHelper_ !== "" && hass.states[weatherUseLocalHelper_]) {
-                weatherUseLocal_ = (hass.states[weatherUseLocalHelper_].state === "on");
-            }
-            if (videoSwitchPeriodHelper_ !== "" && hass.states[videoSwitchPeriodHelper_]) {
-                const val = parseInt(hass.states[videoSwitchPeriodHelper_].state);
-                if (!isNaN(val) && val > 0) {
-                    videoSwitchPeriod_ = val;
-                }
-            }
-
-            if (hass.states[weatherEntity_]) {
-                const state = hass.states[weatherEntity_].state;
-                if (state !== "unknown" && state !== "unavailable") {
-                    return state;
-                }
-            }
-        }
-        await delay(500);
-    }
-    return "unknown";
+// Never wait for weather before showing page-specific or fallback backgrounds.
+function readWeather() {
+    const states=getHass()?.states;
+    if(!states)return 'unknown';
+    const control=states[weatherControlHelper_]?.state,local=states[weatherUseLocalHelper_]?.state;
+    if(control==='on'||control==='off')weatherControl_=control==='on';
+    if(local==='on'||local==='off')weatherUseLocal_=local==='on';
+    const period=Number(states[videoSwitchPeriodHelper_]?.state);
+    if(Number.isFinite(period)&&period>0)videoSwitchPeriod_=Math.max(1,Math.min(period,2147483));
+    const weather=states[weatherEntity_]?.state;
+    return weather&&weather!=='unavailable'?weather:'unknown';
 }
 
 function getVideoConfig(weatherState) {
@@ -169,77 +165,75 @@ function getVideoConfig(weatherState) {
     return config;
 }
 
-function checkPageChange() {
-    if (window.location.pathname !== lastPathname) {
-        lastPathname = window.location.pathname;
-        return true;
-    }
-    return false;
-}
-
 function updateIntervalTimer() {
-    if (currentIntervalId) clearInterval(currentIntervalId);
-    currentSwitchPeriod = videoSwitchPeriod_;
-
-    currentIntervalId = setInterval(() => {
-        updateVideoSource();
-    }, currentSwitchPeriod * 1000);
+    clearInterval(currentIntervalId);
+    currentSwitchPeriod=videoSwitchPeriod_;
+    currentIntervalId=setInterval(()=>updateVideoSource(true),currentSwitchPeriod*1000);
 }
 
-async function updateVideoSource() {
-    const weatherState = await fetchWeatherRobustly();
-    const config = getVideoConfig(weatherState);
-
-    if (!config.files || config.files.length === 0) return;
-
-    const i = Math.floor(Math.random() * config.files.length);
-    const selectedFile = config.files[i];
-    const newSrc = config.path + "/" + selectedFile;
-
-    const extension = selectedFile.split('.').pop().toLowerCase();
-    const detectedType = (extension === 'webm') ? 'video/webm' : 'video/mp4';
-
-    if (video.type !== detectedType) video.type = detectedType;
-    if (!video.src.endsWith(newSrc)) video.src = newSrc;
-
-    if ((navigator.userAgent).includes(slowDeviceUserAgent) || !config.autoplay) {
-        video.autoplay = false;
-        video.pause();
-    } else {
-        video.autoplay = true;
-        video.play().catch(e => console.warn("Autoplay blocked:", e));
-    }
-
-    if (currentSwitchPeriod !== videoSwitchPeriod_) {
-        updateIntervalTimer();
+function applyPlayback(autoplay) {
+    const moving=!navigator.userAgent.includes(slowDeviceUserAgent)&&autoplay;
+    video.autoplay=moving;
+    if(!moving||document.hidden){video.pause();return;}
+    if(video.paused&&!playPending&&performance.now()-lastPlayAttempt>2000){
+    playPending=true;lastPlayAttempt=performance.now();
+    video.play().catch(error=>{
+        // Source changes can abort an earlier play(); this is not an autoplay failure.
+        if(!stopped&&error.name!=='AbortError')console.debug('ANIMATED-BACKGROUNDS: Playback deferred.',error);
+    }).finally(()=>{playPending=false});
     }
 }
 
-async function init() {
-    document.body.insertBefore(video, document.body.firstChild);
-    await loadExternalConfig();
-    updateVideoSource();
-    updateIntervalTimer();
+function updateVideoSource(rotate=false) {
+    if(stopped||!initialized)return;
+    const config=getVideoConfig(readWeather());
+    if(currentSwitchPeriod!==videoSwitchPeriod_)updateIntervalTimer();
+    if(!config.files?.length)return;
+    const pool=JSON.stringify([config.path,config.files]);
+    if(pool!==currentPool||!selectedURL||(rotate&&!document.hidden)){
+        currentPool=pool;
+        const file=config.files[Math.floor(Math.random()*config.files.length)];
+        const url=new URL(config.path+'/'+file,location.href).href;
+        if(url!==selectedURL){selectedURL=url;video.src=url;lastPlayAttempt=-Infinity;metrics.sourceChanges++;}
+    }
+    applyPlayback(config.autoplay);
+}
 
-    window.setInterval(function() {
-        if (checkPageChange()) {
-            console.log("Global Route Event triggered:", window.location.pathname);
-            updateVideoSource();
-        }
-    }, 1000);
+function routeChanged(){lastPathname=location.pathname;updateVideoSource();}
+function pollState(){
+    // Catch navigation without HA's event and helpers/weather becoming available later.
+    if(document.hidden)return;
+    if(location.pathname!==lastPathname)routeChanged();else updateVideoSource();
+}
+function visibilityChanged(){if(document.hidden)video.pause();else {lastPlayAttempt=-Infinity;routeChanged();}}
+function stop(){
+    stopped=true;clearInterval(routeTimer);clearInterval(currentIntervalId);clearTimeout(configTimeout);configController?.abort();
+    document.removeEventListener('DOMContentLoaded',init);
+    document.removeEventListener('visibilitychange',visibilityChanged);
+    for(const event of ['location-changed','popstate','pageshow'])window.removeEventListener(event,routeChanged);
+    video.pause();video.removeAttribute('src');video.load();video.remove();
+    document.getElementById('ha-animated-backgrounds-style')?.remove();
+}
+window.haAnimatedBackgrounds={version:'1.6.0',refresh:routeChanged,stop,
+    get status(){return {stopped,initialized,pathname:lastPathname,source:selectedURL,...metrics}}};
 
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(`
-    #myVideo { position: fixed; right: 0; bottom: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; pointer-events: none; }
+function init() {
+    if(stopped||initialized)return;
+    initialized=true;
+    // Install layout before any fetch/play work. A slow optional JSON must not
+    // leave an unstyled video in the document or block route subscriptions.
+    const style=document.createElement('style');style.id='ha-animated-backgrounds-style';
+    style.textContent=`#myVideo { position: fixed; right: 0; bottom: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; pointer-events: none; }
     .content { position: fixed; bottom: 0; background: rgba(0, 0, 0, 0.5); color: #f1f1f1; width: 100%; padding: 20px; }
     #myBtn { width: 200px; font-size: 18px; padding: 10px; border: none; background: #000; color: #fff; cursor: pointer; }
-    #myBtn:hover { background: #ddd; color: black; }
-    `);
-    document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+    #myBtn:hover { background: #ddd; color: black; }`;
+    document.head.append(style);document.body.prepend(video);
+    for(const event of ['location-changed','popstate','pageshow'])window.addEventListener(event,routeChanged);
+    document.addEventListener('visibilitychange',visibilityChanged);
+    updateIntervalTimer();updateVideoSource();
+    routeTimer=setInterval(pollState,500);
+    loadExternalConfig().then(()=>{if(!stopped)updateVideoSource()});
 }
 
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => init());
-} else {
-    init();
-}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();

@@ -1,0 +1,29 @@
+<!doctype html><meta charset="utf-8"><title>Animated Background scheduling tests</title>
+<home-assistant></home-assistant><pre id="report">Running…</pre>
+<script>
+// Isolated scheduling fixture: no HA connection or media downloads required.
+const originalFetch=window.fetch,originalPlay=HTMLMediaElement.prototype.play;
+HTMLMediaElement.prototype.play=function(){return Promise.resolve()};
+window.fetch=(url,options)=>String(url).includes('/animated_backgrounds/config.json')?Promise.resolve(new Response(JSON.stringify({videoFiles:{'page-test-background':['data:,initial'],'page-runtime-camera':['data:,camera'],'page-runtime-settings':['data:,settings']}}),{headers:{'Content-Type':'application/json'}})):originalFetch(url,options);
+window.started=performance.now();
+</script>
+<script src="../www/styles.js"></script>
+<script>
+(async()=>{
+const report=document.querySelector('#report'),lines=[],originalPath=location.pathname;
+const check=(label,ok)=>{lines.push((ok?'PASS ':'FAIL ')+label);report.textContent=lines.join('\n');if(!ok)throw Error(label)};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function until(predicate){const start=performance.now();while(!predicate()){if(performance.now()-start>1000)throw Error('Timed out');await wait(10)}}
+try{
+await until(()=>haAnimatedBackgrounds.status.source.endsWith('data:,initial'));
+check('page video without waiting for unavailable weather',performance.now()-started<1000);
+const video=document.querySelector('video');check('video is styled before any config dependency',getComputedStyle(video).position==='fixed');
+for(const path of ['/runtime-camera','/runtime-settings','/runtime-camera']){history.pushState({},'',path);window.dispatchEvent(new Event('location-changed'));check('immediate navigation '+path,haAnimatedBackgrounds.status.source.endsWith(path.endsWith('camera')?'data:,camera':'data:,settings'))}
+const changes=haAnimatedBackgrounds.status.sourceChanges;window.dispatchEvent(new Event('location-changed'));await wait(600);check('unchanged pool does not reload source',haAnimatedBackgrounds.status.sourceChanges===changes);
+const duplicate=document.createElement('script');duplicate.src='/www/styles.js?duplicate';document.head.append(duplicate);await wait(100);check('duplicate load creates one video and stylesheet',document.querySelectorAll('#myVideo').length===1&&document.querySelectorAll('#ha-animated-backgrounds-style').length===1);
+haAnimatedBackgrounds.stop();check('stop removes video and layout',!document.querySelector('#myVideo')&&!document.querySelector('#ha-animated-backgrounds-style'));
+report.textContent+='\nALL TESTS PASSED';
+}catch(error){report.textContent+='\nERROR '+error.stack}
+finally{history.replaceState({},'',originalPath);window.fetch=originalFetch;HTMLMediaElement.prototype.play=originalPlay}
+})();
+</script>

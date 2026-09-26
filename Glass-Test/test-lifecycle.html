@@ -1,0 +1,32 @@
+<!doctype html><meta charset="utf-8"><title>Liquid Glass lifecycle and cache tests</title>
+<style>body{font:14px system-ui;background:#243;color:white}ha-card{display:block;width:240px;height:70px;border-radius:20px}#report{white-space:pre-wrap}#fixtures{position:fixed;top:0;left:600px}</style>
+<pre id="report">Running…</pre><div id="fixtures"><div id="empty"></div><div id="late"></div></div>
+<script>window.originalShadow=Element.prototype.attachShadow;document.querySelector('#empty').attachShadow({mode:'open'});</script>
+<script src="../www/ha-liquid-glass.js"></script>
+<script>
+(async()=>{
+const report=document.querySelector('#report'),lines=[];
+const check=(label,ok)=>{lines.push((ok?'PASS ':'FAIL ')+label);report.textContent=lines.join('\n');if(!ok)throw Error(label)};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function until(predicate){const start=performance.now();while(!predicate()){if(performance.now()-start>1200)throw Error('Timed out');await wait(16)}return Math.round(performance.now()-start)}
+try{
+await wait(100);
+let card;
+for(const id of ['empty','late']){
+ const host=document.querySelector('#'+id),root=host.shadowRoot||host.attachShadow({mode:'open'});
+ card=document.createElement('ha-card');card.style.cssText='display:block;width:240px;height:70px;border-radius:20px';root.append(card);
+ const ms=await until(()=>card.hasAttribute('data-ha-liquid-glass'));
+ check(id+' shadow root reacts without polling ('+ms+' ms)',true);
+}
+card.style.setProperty('--liquid-glass-enabled','0');await until(()=>!card.hasAttribute('data-ha-liquid-glass'));check('inline theme opt-out without refresh()',true);
+card.style.setProperty('--liquid-glass-enabled','1');await until(()=>card.hasAttribute('data-ha-liquid-glass'));check('inline theme re-enable without refresh()',true);
+const clone=card.cloneNode();clone.removeAttribute('data-ha-liquid-glass');clone.style.removeProperty('--ha-lg-filter');document.querySelector('#empty').shadowRoot.append(clone);await until(()=>clone.hasAttribute('data-ha-liquid-glass'));check('identical geometry reuses texture',haLiquidGlass.status.cacheHits>=2);
+const previousRoot=clone.getRootNode();document.querySelector('#late').shadowRoot.append(clone);await until(()=>{const id=clone.style.getPropertyValue('--ha-lg-filter').match(/#([^\"]+)/)?.[1];return id&&clone.getRootNode().getElementById(id)});check('moving between roots relocates SVG',!previousRoot.getElementById(clone.style.getPropertyValue('--ha-lg-filter').match(/#([^\"]+)/)[1]));
+const before=haLiquidGlass.status.visited;card.style.setProperty('--liquid-glass-strength','90');await wait(100);check('theme mutation avoids full DOM traversal',haLiquidGlass.status.visited===before);
+const scans=haLiquidGlass.status.scans;await wait(150);check('own writes do not create observer loop',haLiquidGlass.status.scans-scans<=1);
+document.querySelector('#fixtures').remove();await until(()=>haLiquidGlass.status.surfaces===0);check('detached roots and filters cleaned',haLiquidGlass.status.watchedRoots===1);
+haLiquidGlass.stop();check('attachShadow restored and caches released',Element.prototype.attachShadow===originalShadow&&haLiquidGlass.status.cachedTextures===0&&haLiquidGlass.status.watchedRoots===0);
+report.textContent+='\nALL TESTS PASSED';
+}catch(error){report.textContent+='\nERROR '+error.stack}
+})();
+</script>
