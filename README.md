@@ -44,7 +44,7 @@ Simply add a list with the prefix page-your-tab in your JSON, and the script aut
 The script dynamically detects the MIME-type on every single video change. You can freely mix .mp4 and .webm files inside the very same list.
 
 ⚡ **Instant Cache-Busting:**<br/>
-The configuration file is fetched with a cache-busting timestamp. Any updates to your video lists are active immediately after a page refresh—no more manual browser cache purging!
+The configuration file is requested with browser cache revalidation. Any updates to your video lists are active immediately after a page refresh—no more manual browser cache purging!
 
 🔒 **No Long-Term Tokens Needed:**<br/>
 The script safely communicates directly with the native Home Assistant frontend DOM object to fetch states, removing the old requirement for manual long-term access tokens.
@@ -54,49 +54,61 @@ Toggle weather control, switch between local/CDN paths, or adjust the video rota
 
 ## <a name="install"></a>📦 Installation
 
-1. Copy the styles.js file into your Home Assistant local www folder: config/www/ (or /homeassistant/www/).
-2. In Home Assistant, go to Settings -> Dashboards -> Resources (click the three dots in the top right corner if you don't see it).
-3. Add a new resource:
-   URL: /local/styles.js?v=1.5
-   Resource type: JavaScript-Modul
-4. Open your configuration.yaml and add the script to your frontend section like this:
+### HACS / Marketplace (recommended)
+
+1. Add `https://github.com/dreimer1986/ha_animated_backgrounds` as a custom repository of type **Dashboard** in HACS (the built-in Marketplace uses the same package).
+2. Download **Animated Backgrounds & Liquid Glass**. Both modules are included in one file. HACS normally registers it as a dashboard JavaScript module automatically; for YAML resources, add `/hacsfiles/ha_animated_backgrounds/ha_animated_backgrounds.js` yourself.
+3. To activate backgrounds and glass on the sidebar and non-dashboard pages too, merge this into your existing `configuration.yaml`:
+
 ```yaml
-   frontend:
-     extra_module_url:
-       - /local/styles.js?v=1.5
+frontend:
+  extra_module_url:
+    - /hacsfiles/ha_animated_backgrounds/ha_animated_backgrounds.js
 ```
 
-5. **Optional:** Create a folder named config/www/animated_backgrounds/ to store your local video files.
-6. Restart Home Assistant or reload the core configuration.
+4. Restart Home Assistant and refresh each browser/app frontend. Make your theme transparent as explained below. Liquid Glass is configured through theme variables; see [the glass guide](GLASS-README.md).
+5. Optionally put personal videos and configuration in `www/animated_backgrounds/` as described below.
+
+For migration, remove the old `/local/styles.js?...` and `/local/ha-liquid-glass.js?...` entries from **both** dashboard resources and `frontend.extra_module_url`. Do not load the old scripts alongside the new bundle: whichever loads first owns that module. Keep your existing videos and JSON unchanged.
+
+### Updates
+
+Install new versions through HACS/Marketplace, then refresh the frontend. HACS updates its dashboard resource URL for cache invalidation. If a browser still shows the old globally loaded version, hard-refresh it or append the new release version (for example `?v=1.7.0`) to the `extra_module_url` entry and restart Home Assistant. Never edit the generated file under `www/community/ha_animated_backgrounds/`: updates replace that directory.
+
+Personal files remain under `www/animated_backgrounds/` and are not part of the HACS package. Tampermonkey scripts still need separate installation in the browser extension. `Glass-Test/` contains development previews/tests and is not required on your HA server.
+
+### Manual installation
+
+Copy `dist/ha_animated_backgrounds.js` to `config/www/ha_animated_backgrounds.js`. Add `/local/ha_animated_backgrounds.js?v=1.7.0` as a JavaScript-module dashboard resource and to `frontend.extra_module_url`. Restart Home Assistant. Replace this file and update its version query when upgrading. The separate `www/styles.js` and `www/ha-liquid-glass.js` remain available for existing manual installations; use either those or the bundle.
 
 ## <a name="config"></a>⚙️ The Magic Configuration (config.json and Home Assistant Helpers)
 
-To supply your own videos or set up specific pages, create a file named config.json and place it right inside your video directory (www/animated_backgrounds/config.json).
+Create `config/www/animated_backgrounds/config.json` (served as `/local/animated_backgrounds/config.json`). You can copy [config.json.example](www/config.json.example) as a starting point. This location is fixed even if you choose a different video directory.
 
-Example: A fully customized config.json
+Minimal example for local random videos:
+
 ```json
 {
+  "settings": {
+    "weatherControl": false,
+    "weatherEntity": "weather.forecast_home",
+    "videoSwitchPeriod": 180
+  },
   "videoFiles": {
-    "sunny": [
-      "my_local_sunny_day.mp4",
-      "another_clear_sky.webm"
-    ],
-    "rainy": [
-      "cozy_rain_loop.mp4"
-    ],
-    "page-wallbox": [
-      "charging_animation_1.webm",
-      "tesla_loop.mp4"
-    ],
-    "page-livingroom": [
-      "fireplace_4k.mp4"
-    ]
+    "random": ["garden.mp4", "evening.webm"],
+    "page-wallbox": ["charging.webm"]
   }
 }
 ```
 
+Put those video files next to the JSON. For weather-based local playback, set both `weatherControl` and `weatherUseLocal` to `true` and provide lists such as `sunny`, `rainy` and `clear-night`. With `weatherUseLocal: false`, weather filenames refer to the Flixel CDN instead. Random and page-specific lists always use the local video path.
+
+All fields are optional. Existing files containing only `videoFiles` remain compatible. Non-empty filename lists replace the corresponding built-in lists; omitted or empty lists retain defaults. Supply filenames relative to the video directory, including `.mp4` or `.webm`. Some built-in random/page lists and the `hail`/`exceptional` weather lists are placeholders: provide your own files for these conditions.
+
+Use valid JSON: double quotes, no comments or trailing commas. Invalid or unavailable configuration falls back to defaults, with a message in the browser console. Configuration loading has a two-second timeout so it cannot block the interface. Refresh the page after saving; the request revalidates the JSON rather than reusing it silently from cache. Playback may briefly use defaults while configuration loads.
+
 **How does Dynamic Page Routing work?**<br/>
-If a user opens a dashboard tab with the URL /dashboard-main/wallbox, the script scans the JSON keys starting with page-. It detects page-wallbox, matches the keyword wallbox against the current URL, and immediately switches the background to your specified wallbox loops. The moment you navigate away to a standard page, it instantly reverts back to the default weather or random rotation!
+If a user opens a dashboard tab with the URL /dashboard-main/wallbox, the script scans the JSON keys starting with page-. It detects page-wallbox, matches the keyword wallbox against the current URL path, and immediately switches the background to your specified wallbox loops. The moment you navigate away to a standard page, it instantly reverts back to the default weather or random rotation!
 
 **Optional Home Assistant Helpers**
 
@@ -108,73 +120,27 @@ The script automatically checks for predefined helpers in Home Assistant. If the
 | **Use Local Files** | `input_boolean` | `input_boolean.animated_backgrounds_use_local` | **On:** Uses local files under `/local/animated_backgrounds/` for weather states as well.<br>**Off:** Loads weather videos efficiently from the Flixel CDN. |
 | **Switch Interval** | `input_number` | `input_number.animated_backgrounds_video_switch_period` | Defines the interval in seconds after which a new random video is selected from the active list (e.g., `180` for 3 minutes). |
 
-**The manual way**<br/>
-If you look at the script with a fitting editor you can see the starting section has a few settings you can tinker with and by doing so, change the default settings without the need for a config.
-All of them are being explained now:
+### Settings reference
 
-### 🌐 const weatherEntity_ = "weather.forecast_home";
+Place these keys inside the `settings` object. You do not need to edit JavaScript.
 
-Needed if you want to use the weather depending backgrounds. I chose the Home Assistant default one here. "weather.forecast_home" The state of this entity controls the backgrounds that are being used.
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `weatherEntity` | `weather.forecast_home` | Weather entity to read. |
+| `localVideoPath` | `/local/animated_backgrounds` | Base URL for local videos; does not move the JSON file. |
+| `flixelVideoPath` | `https://cdn.flixel.com/flixel` | Base URL for remote weather videos. |
+| `weatherControl` | `true` | Weather selection; `false` selects the random list unless a page rule matches. |
+| `weatherUseLocal` | `false` | Resolve weather filenames under the local path instead of the CDN. |
+| `videoSwitchPeriod` | `180` | Rotation interval in seconds; positive number, limited to 1–2147483. |
+| `weatherControlHelper` | `input_boolean.animated_backgrounds_weather_control` | Optional helper overriding `weatherControl`. |
+| `weatherUseLocalHelper` | `input_boolean.animated_backgrounds_use_local` | Optional helper overriding `weatherUseLocal`. |
+| `videoSwitchPeriodHelper` | `input_number.animated_backgrounds_video_switch_period` | Optional helper overriding the interval. |
+| `slowDeviceUserAgent` | `Kindle` | Case-sensitive user-agent substring for paused-video mode. |
+| `lowPowerMode` | `false` | Pause playback for the built-in `page-cam` rule. |
 
-### 📂 const localVideoPath_ = "/local/animated_backgrounds"
+Precedence: built-in defaults → JSON settings → available Home Assistant helpers. A valid helper state therefore takes precedence over the corresponding JSON value. Missing/unavailable helpers leave the current setting in place. Booleans must be JSON `true`/`false`, the interval must be a number, and entity IDs/paths must be non-empty strings. Invalid individual settings are ignored.
 
-Path to your locally saved videos. I have my whole collection on my Home Assistant hardware, but you can decide if you use local files or videos coming from flixel.com. By default this path does not do anything unless you change "weatherControl_" aka "input_boolean.animated_backgrounds_weather_control" or "weatherUseLocal_" aka "input_boolean.animated_backgrounds_use_local". Otherwise the videos will be taken from flixel.com. For convenience I put the correct paths for the flixel.com hosted videos used by Villhellm's addin here aswell. The flixel.com videos are already in the lists we talk about below.
-
-### 🔗 const flixelVideoPath_ = "https://cdn.flixel.com/flixel";
-
-Keep as it is, unless flixel changes stuff on their website! This one is needed to create a working flixel.com video-link!
-
-### 🔄 let weatherControl_ = true;
-
-If a pure randomizer is needed, set it to false. For weather based randomizer, leave it set to true.
-
-### 🏠 let weatherUseLocal_ = false;
-
-Allows you to choose if the weather videos should come from flixel.com or local folders, keep default if you just want animated backgrounds and have no videos prepared at all.
-
-### ⏱️ let videoSwitchPeriod_ = 180;
-
-After x seconds, the video will be diced again. This verifies the weather is still the same, too. Otherwise the dice will check the now correct file list.
-
-### 🎛️ const weatherControlHelper_ = "input_boolean.animated_backgrounds_weather_control";
-
-Here you can put a name for a Helper inside Home Assistant, like the default "input_boolean.animated_backgrounds_weather_control". The value you give it in Home Assistant will then be applied to "weatherControl_" above.
-
-### 🛠️ const weatherUseLocalHelper_ = "input_boolean.animated_backgrounds_use_local";
-
-Here you can put a name for a Helper inside Home Assistant, like the default "input_boolean.animated_backgrounds_use_local". The value you give it in Home Assistant will then be applied to "weatherUseLocal_" above.
-
-### 🔢 const videoSwitchPeriodHelper_ = "input_number.animated_backgrounds_video_switch_period";
-
-Here you can put a name for a Helper inside Home Assistant, like the default "input_number.animated_backgrounds_video_switch_period". The value you give it in Home Assistant will then be applied to "videoSwitchPeriod_" above.
-
-### 📱 const slowDeviceUserAgent = "Kindle";
-
-Allows to add a device type as a exception to never playback videos and always show them paused. The value is compared to the user agent of the devices loading the Home Assistant websites. The default case are Amazon Kindles.
-
-### 🔋 const lowPowerMode = false;
-
-Always forces videos to never playback and always show in paused state. Default is not using it.
-
-### 📁 let videoFiles:
-
-Below that you can find a longer list of video names.
-
-First one is the one used by pure randomizer. In my case 62 videos numbered from 1.mp4 - 62.mp4. Edit to your needs.
-ONLY used if weatherControl_: false;
-
-Then there are 15 lists for specific weather types. You can differentiate them just by their names. Add the videos you want there, or leave it as it is to use flixel.com hosted ones. In this case it's Villhellm's list extended a bit to just need hail and exceptional condition videos before being complete. Rest is filled already. If you find nice videos on flixel, report them to me please!
-ONLY used if weatherControl_: true; AND you set "let weatherUseLocal_ = false;" above. Otherwise it will try to load the video names locally.
-
-### Sidenote
-
-If you change anything on your settings inside the script after installation, go to the the Dashboard Resources Settings again and edit the number on "/local/styles.js?v=" to something different than before. This will force a Cache reset on it and really activate your updates.
-
-**OR YOU JUST USE THE CONFIG.JSON!**
-
-### WARNING!
-
-The syntax is there for a reason. So if you see "" or '' and the stuff you wanna edit is between them, then edit to your needs and be 100% sure that they are STILL THERE. :D Same for [] or the , separating stuff. All needs to be the same way as it is right now. But of course you can increase/reduce the filelist entry number to your liking. Right now they all have different numbers of entries and you can add one with a , and '' or remove one by removing it and one ,.
+The JSON and videos are public static files under `/local/`; do not put passwords or tokens there. No authentication tokens are needed by this module.
 
 ## <a name="themes"></a>🎨 Theme Modifications (Making it transparent)
 
@@ -299,10 +265,22 @@ These are the very same pics shown on my own Modified Theme Repo: https://github
 
 ## Liquid Glass and UIX sidebar
 
-The optional frontend module is in [`www/ha-liquid-glass.js`](www/ha-liquid-glass.js). Version 0.5 adds individual glass sidebar buttons, coordinated with the updated Your Name UIX themes. Install it as `/local/ha-liquid-glass.js?v=0.6.0`; use `frontend.extra_module_url` for loading on all HA pages. Update the animated-background script to `/local/styles.js?v=1.6.0` too: page-specific videos no longer wait for weather data, configuration fetches have a timeout, and route events update the source immediately. See [installation and theme settings](Glass-Test/INSTALL.md) and the [offline configurator](Glass-Test/Glass-Vergleich.html).
+The glass module is included in the combined HACS bundle. Its canonical source remains [`www/ha-liquid-glass.js`](www/ha-liquid-glass.js). Version 0.5 added individual glass sidebar buttons, coordinated with the updated Your Name UIX themes. Use the combined installation instructions above; do not additionally load the standalone scripts. See [theme settings](Glass-Test/INSTALL.md) and the [offline configurator](Glass-Test/Glass-Vergleich.html).
 
 The user confirmed the version 0.4 glass effect works in Chrome on Android and the official Home Assistant app. The new sidebar integration has been checked locally and still needs validation on the actual device.
 
-### Faster startup and navigation (styles.js 1.6.0 / glass 0.6.0)
+### Startup and navigation
 
-Replace the existing module URLs with `/local/styles.js?v=1.6.0` and `/local/ha-liquid-glass.js?v=0.6.0`, then fully reload the frontend. Keep existing theme values. For loading across all HA pages, use the existing `frontend.extra_module_url` list. Optional JSON loads asynchronously with a two-second timeout; built-in backgrounds work while it loads. HA helper/weather changes are picked up within 500 ms, with no weather retry delay on page transitions. The video continues when the selected pool is unchanged. Diagnostics: `window.haAnimatedBackgrounds.status`; stop with `.stop()`. Glass now observes new open shadow roots directly and caches identical displacement textures. See `Glass-Test/INSTALL.md` for measurements and remaining browser/rendering limits.
+The HACS bundle includes the scheduling improvements introduced in background engine 1.6.0 and glass 0.6.0. Keep existing theme values. Optional JSON loads asynchronously with a two-second timeout; built-in backgrounds work while it loads. HA helper/weather changes are picked up within 500 ms, with no weather retry delay on page transitions. The video continues when the selected pool is unchanged. Diagnostics: `window.haAnimatedBackgrounds.status`; stop with `.stop()`. Glass observes new open shadow roots directly and caches identical displacement textures. See `Glass-Test/INSTALL.md` for measurements and remaining browser/rendering limits.
+
+## Building and releasing
+
+The canonical sources remain `www/styles.js` and `www/ha-liquid-glass.js`.
+
+```sh
+python scripts/build_hacs.py
+python scripts/build_hacs.py --check
+node --test tests/config.test.cjs
+```
+
+Commit the generated `dist/ha_animated_backgrounds.js` with source changes. The bundle contains both modules, so a release cannot mix cached imports from different versions. Personal config, videos and development files are excluded. Push a version tag such as `v1.7.0` after updating the changelog to trigger validation and a GitHub release with the standalone bundle attached. Branch/PR checks also verify that the bundle matches its sources.

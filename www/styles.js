@@ -2,7 +2,7 @@
 'use strict';
 if (window.haAnimatedBackgrounds) return;
 console.info(
-    '%c  ANIMATED-BACKGROUNDS  %c  version 1.6.0 (Universal)  %c  by dreimer1986 ',
+    '%c  ANIMATED-BACKGROUNDS  %c  version 1.7.0 (Universal)  %c  by dreimer1986 ',
              'color: orange; font-weight: bold; background: black',
              'color: white; font-weight: bold; background: dimgray',
              'color: white; font-weight: bold; background: rgb(71, 170, 238)',
@@ -11,9 +11,10 @@ console.info(
 // ==========================================
 // CONFIGURATION
 // ==========================================
-const weatherEntity_ = "weather.forecast_home";
-const localVideoPath_ = "/local/animated_backgrounds";
-const flixelVideoPath_ = "https://cdn.flixel.com/flixel";
+const configURL = "/local/animated_backgrounds/config.json";
+let weatherEntity_ = "weather.forecast_home";
+let localVideoPath_ = "/local/animated_backgrounds";
+let flixelVideoPath_ = "https://cdn.flixel.com/flixel";
 
 // Default settings (Used if Helpers are empty or unavailable)
 let weatherControl_ = true;
@@ -23,13 +24,13 @@ let videoSwitchPeriod_ = 180;
 // ==========================================
 // HOME ASSISTANT HELPERS
 // ==========================================
-const weatherControlHelper_ = "input_boolean.animated_backgrounds_weather_control";
-const weatherUseLocalHelper_ = "input_boolean.animated_backgrounds_use_local";
-const videoSwitchPeriodHelper_ = "input_number.animated_backgrounds_video_switch_period";
+let weatherControlHelper_ = "input_boolean.animated_backgrounds_weather_control";
+let weatherUseLocalHelper_ = "input_boolean.animated_backgrounds_use_local";
+let videoSwitchPeriodHelper_ = "input_number.animated_backgrounds_video_switch_period";
 
 // Settings for forcing specific devices into single frame static image mode
-const slowDeviceUserAgent = "Kindle";
-const lowPowerMode = false;
+let slowDeviceUserAgent = "Kindle";
+let lowPowerMode = false;
 
 // ==========================================
 // DEFAULT FILE LISTS (Overridden if config.json exists)
@@ -89,12 +90,30 @@ async function loadExternalConfig() {
     try {
         configController=new AbortController();
         configTimeout=setTimeout(()=>configController.abort(),2000);
-        const response = await fetch(`${localVideoPath_}/config.json`,{signal:configController.signal,cache:'no-cache'});
+        const response = await fetch(configURL,{signal:configController.signal,cache:'no-cache'});
         if(stopped)return;
         if (response.ok) {
             const json = await response.json();
-            if (json && json.videoFiles) {
-                for (const key in json.videoFiles) {
+            if (json && typeof json === 'object' && !Array.isArray(json)) {
+                const settings = json.settings;
+                if (settings && typeof settings === 'object' && !Array.isArray(settings)) {
+                    const text = (key, fallback) => typeof settings[key] === 'string' && settings[key].trim() ? settings[key].trim() : fallback;
+                    weatherEntity_ = text('weatherEntity', weatherEntity_);
+                    localVideoPath_ = text('localVideoPath', localVideoPath_).replace(/\/+$/, '');
+                    flixelVideoPath_ = text('flixelVideoPath', flixelVideoPath_).replace(/\/+$/, '');
+                    weatherControlHelper_ = text('weatherControlHelper', weatherControlHelper_);
+                    weatherUseLocalHelper_ = text('weatherUseLocalHelper', weatherUseLocalHelper_);
+                    videoSwitchPeriodHelper_ = text('videoSwitchPeriodHelper', videoSwitchPeriodHelper_);
+                    slowDeviceUserAgent = text('slowDeviceUserAgent', slowDeviceUserAgent);
+                    if (typeof settings.weatherControl === 'boolean') weatherControl_ = settings.weatherControl;
+                    if (typeof settings.weatherUseLocal === 'boolean') weatherUseLocal_ = settings.weatherUseLocal;
+                    if (typeof settings.lowPowerMode === 'boolean') lowPowerMode = settings.lowPowerMode;
+                    if (typeof settings.videoSwitchPeriod === 'number' && Number.isFinite(settings.videoSwitchPeriod) && settings.videoSwitchPeriod > 0) {
+                        videoSwitchPeriod_ = Math.max(1, Math.min(settings.videoSwitchPeriod, 2147483));
+                    }
+                }
+                for (const key of Object.keys(json.videoFiles || {})) {
+                    if (['__proto__', 'constructor', 'prototype'].includes(key)) continue;
                     if (Array.isArray(json.videoFiles[key])) {
                         const files=json.videoFiles[key].filter(file=>typeof file==='string'&&file.trim());
                         if(files.length)videoFiles[key] = files;
@@ -214,7 +233,7 @@ function stop(){
     video.pause();video.removeAttribute('src');video.load();video.remove();
     document.getElementById('ha-animated-backgrounds-style')?.remove();
 }
-window.haAnimatedBackgrounds={version:'1.6.0',refresh:routeChanged,stop,
+window.haAnimatedBackgrounds={version:'1.7.0',refresh:routeChanged,stop,
     get status(){return {stopped,initialized,pathname:lastPathname,source:selectedURL,...metrics}}};
 
 function init() {

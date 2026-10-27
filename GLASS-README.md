@@ -1,5 +1,7 @@
 # Liquid Glass · 0.6.0
 
+**HACS:** Hintergrund-Engine und Liquid Glass sind gemeinsam in `dist/ha_animated_backgrounds.js` enthalten. Installation und Updates stehen in der [Hauptanleitung](README.md#install). Die unten genannten Einzeldateien und ZIPs sind für manuelle Installationen und Offline-Vorschauen; nicht zusätzlich zum HACS-Bundle laden.
+
 `Glass-Test/Glass-Vergleich.html` oder `Glass-Test/Liquid-Glass-Demo.html` direkt in Desktop Chrome/Edge öffnen. Beide enthalten den vollständigen Theme-Konfigurator inklusive HA-Modul und funktionieren offline.
 
 1. **Glasmurmel** für das neue Linsenprofil wählen; alternativ Klarglas, Milchglas oder Extra dick.
