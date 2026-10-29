@@ -154,6 +154,22 @@ The background image of the theme it is. Of course this is in the way if you wan
 lovelace-background: "transparent"
 ```
 
+### ha-panel-background (Home Assistant 2026.11 and newer):
+
+HA 2026.11 adds a panel background layer above the body-level video. Without an
+explicit value, this layer falls back to `primary-background-color` and can hide
+a video that is still playing. Add this alongside `lovelace-background` in your
+active theme (and in any mode-specific overrides that set panel backgrounds):
+
+```yaml
+ha-panel-background: "transparent"
+```
+
+Reload themes with `frontend.reload_themes`, then reload the browser if needed.
+Keep `primary-background-color` unchanged: dialogs and other surfaces still need
+that color. This is a theme compatibility setting; no video player or z-index
+change is required. Verified on Home Assistant 2026.11.0b0.
+
 ### app-header-background-color:
 
 The top navigation header bar looks best with a semi-transparent styling. Convert your theme's HEX color to RGB (https://www.rapidtables.com/convert/color/hex-to-rgb.html) and add an alpha value using rgba(..., 0.5) for a sleek 50% look-through effect:
